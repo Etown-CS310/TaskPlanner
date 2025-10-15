@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
-
-import showPasswordIcon from '../assets/images/show-password.png';
-import hidePasswordIcon from '../assets/images/hide-password.png';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const PasswordInput = ({ value, onChangeText, showPassword, toggleShowPassword }) => {
   return (
@@ -15,11 +13,11 @@ const PasswordInput = ({ value, onChangeText, showPassword, toggleShowPassword }
         secureTextEntry={!showPassword}
       />
       <TouchableOpacity onPress={toggleShowPassword}>
-        <Image
-          source={showPassword ? hidePasswordIcon : showPasswordIcon}
-          style={styles.icon}
-          resizeMode="contain"
-        />
+          <MaterialCommunityIcons
+            name={showPassword ? 'eye-off' : 'eye'}
+            size={24}
+            color="#333"
+          />
       </TouchableOpacity>
     </View>
   );
