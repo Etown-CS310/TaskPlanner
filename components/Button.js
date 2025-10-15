@@ -1,15 +1,14 @@
-import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 
-const LoginButton = ({ onPress }) => {
+function Button({ title, onPress }) {
   return (
     <Pressable style={styles.button} onPress={onPress}>
-      <Text style={styles.buttonText}>Login</Text>
+      <Text style={styles.buttonText}>{title}</Text>
     </Pressable>
   );
 };
 
-export default LoginButton;
+export default Button;
 
 const styles = StyleSheet.create({
   button: {

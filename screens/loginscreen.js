@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import UsernameInput from '../components/UsernameInput';
 import PasswordInput from '../components/PasswordInput';
-import LoginButton from '../components/LoginButton';
+import Button from '../components/Button';
 
     function LoginScreen() {
 
@@ -29,7 +29,7 @@ import LoginButton from '../components/LoginButton';
                 showPassword={showPassword}
                 toggleShowPassword={() => setShowPassword(!showPassword)}
             />
-            <LoginButton onPress={handleLogin} />
+            <Button title={'Login'} onPress={handleLogin} />
         </View>
     );
     }

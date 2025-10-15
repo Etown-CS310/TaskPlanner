@@ -10,10 +10,7 @@ import AddTaskModal from '../components/AddTaskModal';
 
     // Mock Tasks for Presentation
     const [tasks, setTasks] = useState([
-        { id: 1, title: 'Task 1', completed: false },
-        { id: 2, title: 'Task 2', completed: false },
-        { id: 3, title: 'Task 3', completed: true, category: 'Home Task' },
-        { id: 4, title: 'Task 4', completed: false, category: 'Work Task', repeating: 'Repeats M,W @ 9:00AM' },
+        { id: 4, title: 'Mock Task', completed: false, category: 'Work Task', repeating: 'Repeats M,W @ 9:00AM' },
     ]);
 
     const [isModalVisible, setModalVisible] = useState(false);

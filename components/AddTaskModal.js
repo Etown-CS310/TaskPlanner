@@ -5,6 +5,7 @@ function AddTaskModal({ visible, onClose, onAdd }) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [repeatable, setRepeatable] = useState(false);
+  const [dueDate, setDueDate] = useState(false);
 
     const handleAdd = () => {
         const newTask = {
@@ -12,12 +13,14 @@ function AddTaskModal({ visible, onClose, onAdd }) {
             title: title || 'Untitled Task',
             completed: false,
             category: category,
-            repeat: repeatable ? 'Repeats weekly' : null,
+            repeating: repeatable ? 'Repeats weekly' : null,
+            dueBy: dueDate ? 'Due by: ' : null,
         };
         onAdd(newTask);
         setTitle('');
         setCategory('');
         setRepeatable(false);
+        setDueDate(false);
         onClose();
     }
     return (
@@ -39,6 +42,14 @@ function AddTaskModal({ visible, onClose, onAdd }) {
             onChangeText={setCategory}
             style={styles.input}
           />
+
+          <View style={styles.switchRowTight}>
+            <Text>Due By</Text>
+            <Switch
+              value={dueDate}
+              onValueChange={setDueDate}
+            />
+          </View>
 
           <View style={styles.switchRow}>
             <Text>Repeatable</Text>
@@ -90,10 +101,17 @@ modalContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    marginBottom: 20,
+  },
+    switchRowTight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom:-10,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingBottom: 10,
   },
 });
