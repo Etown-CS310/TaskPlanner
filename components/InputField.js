@@ -1,18 +1,17 @@
-import React from 'react';
 import { TextInput, StyleSheet } from 'react-native';
 
-const UsernameInput = ({ value, onChangeText }) => {
+const InputField = ({ value, title, onChangeText }) => {
   return (
     <TextInput
       style={styles.textInput}
-      placeholder='Enter Username'
+      placeholder={title}
       value={value}
       onChangeText={onChangeText}
     />
   );
 };
 
-export default UsernameInput;
+export default InputField;
 
 const styles = StyleSheet.create({
   textInput: {

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { StyleSheet, View, Alert } from "react-native";
+import { StyleSheet, View, Text, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 
-import UsernameInput from '../components/UsernameInput';
-import PasswordInput from '../components/PasswordInput';
+import InputField from '../components/InputField';
+import InputPasswordField from '../components/InputPasswordField';
 import Button from '../components/Button';
+
 
     function LoginScreen() {
 
@@ -22,14 +23,25 @@ import Button from '../components/Button';
 
     return (
         <View style={styles.container}>
-            <UsernameInput value={username} onChangeText={setUsername} />
-            <PasswordInput
+            <Text style={styles.textStyle}>Enter User Details to Login</Text>
+            <InputField value={username} title={"Enter Username"} onChangeText={setUsername} />
+            <InputPasswordField
                 value={password}
+                title={"Enter Password"}
                 onChangeText={setPassword}
                 showPassword={showPassword}
                 toggleShowPassword={() => setShowPassword(!showPassword)}
             />
-            <Button title={'Login'} onPress={handleLogin} />
+            <Button 
+                title={'Login'}
+                onPress={handleLogin}
+            />
+            <Button
+                title={'Signup'}
+                style={styles.signupButton}
+                textStyle={styles.buttonTextStyle}
+                onPress={() => navigation.navigate('Signup')}
+            />
         </View>
     );
     }
@@ -40,9 +52,24 @@ export default LoginScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    textStyle: {
+        fontSize: 15,
+        marginBottom: 10,
+        fontWeight: 'bold',
+        color: 'black',
+    },
+    signupButton: {
+        backgroundColor: '#fff',
+        marginTop: 10,
+        width: '17.5%',
+        paddingVertical: 5,
+    },
+    buttonTextStyle: {
+        color: '#007bff',
     }
 });

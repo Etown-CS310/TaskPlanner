@@ -1,13 +1,12 @@
-import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const PasswordInput = ({ value, onChangeText, showPassword, toggleShowPassword }) => {
+const InputPasswordField = ({ value, title, onChangeText, showPassword, toggleShowPassword }) => {
   return (
     <View style={styles.passwordContainer}>
       <TextInput
         style={styles.passwordInput}
-        placeholder="Enter Password"
+        placeholder={title}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={!showPassword}
@@ -23,7 +22,7 @@ const PasswordInput = ({ value, onChangeText, showPassword, toggleShowPassword }
   );
 };
 
-export default PasswordInput;
+export default InputPasswordField;
 
 const styles = StyleSheet.create({
   passwordContainer: {
