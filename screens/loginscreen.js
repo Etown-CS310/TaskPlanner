@@ -23,8 +23,14 @@ import Button from '../components/Button';
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textStyle}>Enter User Details to Login</Text>
-            <InputField value={username} title={"Enter Username"} onChangeText={setUsername} />
+            <Text style={styles.textStyle}>
+                Enter User Details to Login
+            </Text>
+            <InputField
+                value={username}
+                title={"Enter Username"}
+                onChangeText={setUsername}
+            />
             <InputPasswordField
                 value={password}
                 title={"Enter Password"}
@@ -39,8 +45,15 @@ import Button from '../components/Button';
             <Button
                 title={'Signup'}
                 style={styles.signupButton}
-                textStyle={styles.buttonTextStyle}
+                textStyle={styles.signupTextStyle}
                 onPress={() => navigation.navigate('Signup')}
+            />
+
+            <Button
+                title={'←'}
+                style={styles.backButton}
+                textStyle={styles.backTextStyle}
+                onPress={() => navigation.navigate('FirstTime')}
             />
         </View>
     );
@@ -61,7 +74,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginBottom: 10,
         fontWeight: 'bold',
-        color: 'black',
     },
     signupButton: {
         backgroundColor: '#fff',
@@ -69,7 +81,25 @@ const styles = StyleSheet.create({
         width: '17.5%',
         paddingVertical: 5,
     },
-    buttonTextStyle: {
+    signupTextStyle: {
         color: '#007bff',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20, 
+        left: 20,
+        backgroundColor: '#fff',
+        borderColor: 'black',
+        borderWidth: 2,
+        borderRadius: 5,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backTextStyle: {
+        color: 'black',
+        fontWeight: 'bold',
+        fontSize: 26,
     }
 });

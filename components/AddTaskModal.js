@@ -27,7 +27,7 @@ function AddTaskModal({ visible, onClose, onAdd }) {
             completed: false,
             category: category,
             repeating: repeatable ? 'Repeats weekly' : null,
-            dueBy: dueDate ? 'Due by: ' : null,
+            dueBy: dueDate ? `Due by: ${dueDateValue}` : null,
         };
         onAdd(newTask);
         setTitle('');
@@ -50,13 +50,13 @@ function AddTaskModal({ visible, onClose, onAdd }) {
         <View style={[styles.modalContent, modalContentStyle]}>
           <Text style={styles.modalTitle}>Add Task</Text>
 
-          <TextInput style={styles.input}
+          <TextInput style={[styles.input, {color: title === "" ? "#ccc" : "#000"}]}
             placeholder="Task Title"
             value={title}
             onChangeText={setTitle}
           />
 
-          <TextInput style={styles.input}
+          <TextInput style={[styles.input, {color: category === "" ? "#ccc" : "#000"}]}
             placeholder="Category"
             value={category}
             onChangeText={setCategory}
@@ -71,7 +71,8 @@ function AddTaskModal({ visible, onClose, onAdd }) {
           </View>
 
           {dueDate && (
-              <TextInput style={styles.dueDateInput}
+              <TextInput
+                style={[styles.dueDateInput, {color: dueDateValue === "" ? "#ccc" : "#000"}]}
                 placeholder={`Enter Due Date (In ${new Date().toLocaleDateString()} format)`}
                 onChangeText={setDueDateValue}
                 />
@@ -124,7 +125,6 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    color: '#ccc',
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -146,7 +146,6 @@ const styles = StyleSheet.create({
   dueDateInput: {
     borderBottomWidth: 1,
     borderColor: '#ccc',
-    color: '#ccc',
     marginVertical: 10,
     fontSize: 16,
   },

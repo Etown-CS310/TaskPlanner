@@ -1,11 +1,16 @@
+import React, { useState } from "react";
 import { TextInput, View, StyleSheet } from "react-native";
 
 function SearchBar() {
+  const [text, setText] = useState("");
+
   return (
     <View style={styles.container}>
       <TextInput
         placeholder="Search for Task"
-        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        style={[ styles.input, {color: text === "" ? "#ccc" : "#000"} ]}
       />
     </View>
   );
@@ -24,6 +29,5 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     fontSize: 16,
-    color: '#ccc',
   },
 });

@@ -3,7 +3,7 @@ import { TextInput, StyleSheet } from 'react-native';
 const InputField = ({ value, title, onChangeText }) => {
   return (
     <TextInput
-      style={styles.textInput}
+      style={[styles.textInput, {color: value === "" ? "#ccc" : "#000"}]}
       placeholder={title}
       value={value}
       onChangeText={onChangeText}

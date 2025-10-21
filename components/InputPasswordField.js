@@ -5,7 +5,7 @@ const InputPasswordField = ({ value, title, onChangeText, showPassword, toggleSh
   return (
     <View style={styles.passwordContainer}>
       <TextInput
-        style={styles.passwordInput}
+        style={[styles.passwordInput, {color: value === "" ? "#ccc" : "#000"}]}
         placeholder={title}
         value={value}
         onChangeText={onChangeText}

@@ -17,7 +17,6 @@ function SignupScreen() {
         const [showConfirmPassword, setShowConfirmPassword] = useState(false);
         const navigation = useNavigation();
         
-
         const handleSignup = () => {
             setUsername(username.trim());
             setEmail(email.trim());
@@ -77,6 +76,13 @@ function SignupScreen() {
                 onPress={handleSignup}
             />
 
+            <Button
+                title={'←'}
+                style={styles.backButton}
+                textStyle={styles.backTextStyle}
+                onPress={() => navigation.navigate('Login')}
+            />
+
         </View>
     );
     
@@ -96,5 +102,23 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginBottom: 10,
         fontWeight: 'bold',
+    },
+        backButton: {
+        position: 'absolute',
+        top: 20, 
+        left: 20,
+        backgroundColor: '#fff',
+        borderColor: 'black',
+        borderWidth: 2,
+        borderRadius: 5,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backTextStyle: {
+        color: 'black',
+        fontWeight: 'bold',
+        fontSize: 26,
     }
 });
