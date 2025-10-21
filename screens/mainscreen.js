@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, StyleSheet, View, ScrollView } from "react-native";
+import { StyleSheet, View, ScrollView } from "react-native";
 
 import AddTaskButton from '../components/AddTaskButton.js';
 import SearchBar from '../components/SearchBar.js';
@@ -10,7 +10,7 @@ import AddTaskModal from '../components/AddTaskModal';
 
     // Mock Tasks for Presentation
     const [tasks, setTasks] = useState([
-        { id: 4, title: 'Mock Task', completed: false, category: 'Work Task', repeating: 'Repeats M,W @ 9:00AM' },
+        { id: 4, title: 'Mock Task', completed: false, category: 'Work Task', repeating: 'Repeats M,W @ 9:00AM', dueBy: 'Due by: 10/31' },
     ]);
 
     const [isModalVisible, setModalVisible] = useState(false);
@@ -27,8 +27,7 @@ import AddTaskModal from '../components/AddTaskModal';
 
     return (
         <View style={styles.container}>
-            <SearchBar />
-
+            <SearchBar/>
 
             <ScrollView contentContainerStyle={styles.taskList}>
                 {tasks.map(task => (
@@ -38,10 +37,12 @@ import AddTaskModal from '../components/AddTaskModal';
                     completed={task.completed}
                     category={task.category}
                     repeating={task.repeating}
+                    dueBy={task.dueBy}
                     onToggle={() => toggleTaskCompleted(task.id)}
                 />
                 ))}
             </ScrollView>
+            
             <AddTaskButton onPress={() => setModalVisible(true)} />
 
             <AddTaskModal
@@ -60,9 +61,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: '#fff',
+        paddingTop: 20,
     },
     taskList: {
         paddingTop: 20,

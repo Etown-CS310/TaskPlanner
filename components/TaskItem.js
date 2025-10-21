@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 
-function TaskItem({ title, completed, category, repeating, onToggle }) {
+function TaskItem({ title, completed, category, repeating, dueBy, onToggle }) {
   return (
     <View style= {styles.container}>
       <TouchableOpacity style={styles.checkbox} onPress={onToggle}>
@@ -11,8 +11,11 @@ function TaskItem({ title, completed, category, repeating, onToggle }) {
         <Text style={[styles.title, completed && styles.completed]}>
           {title}
         </Text>
-        {repeating && <Text style={styles.meta}>{repeating}</Text>}
-        {category && <Text style={styles.meta}>{category}</Text>}
+        <View style={styles.taskContainer}>
+          {repeating && <Text style={styles.meta}>{repeating}</Text>}
+          {dueBy && <Text style={styles.meta}>{dueBy}</Text>}
+          {category && <Text style={styles.meta}>{category}</Text>}
+        </View>
       </View>
 
       <TouchableOpacity style={styles.editIcon}>
@@ -29,7 +32,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: 300,
-    height: 60,
+    height: 100,
     borderWidth: 2,
     borderColor: '#002b3d',
     borderRadius: 10,
@@ -51,6 +54,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   textContainer: {
+    justifyContent: 'space-between',
+    flexDirection: 'column',
+    height: '100%',
     flex: 1,
   },
   title: {
