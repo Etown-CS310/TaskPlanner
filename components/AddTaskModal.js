@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Modal,
-         View,
+import Modal from 'react-native-modal';
+import { View,
          Text,
          TextInput,
          TouchableOpacity,
@@ -9,6 +9,8 @@ import { Modal,
          Platform,
          useWindowDimensions,
          StyleSheet } from 'react-native';
+
+import RepeatingModal from './RepeatingModal.js';
 
 function AddTaskModal({ visible, onClose, onAdd }) {
 
@@ -19,6 +21,8 @@ function AddTaskModal({ visible, onClose, onAdd }) {
   const [repeatable, setRepeatable] = useState(false);
   const [dueDate, setDueDate] = useState(false);
   const [dueDateValue, setDueDateValue] = useState('');
+
+  const [RepeatingModalVisible, setRepeatingModalVisible] = useState(false);
 
     const handleAdd = () => {
         const newTask = {
@@ -45,54 +49,67 @@ function AddTaskModal({ visible, onClose, onAdd }) {
 
 
     return (
-    <Modal visible={visible} animationType="slide" transparent={true}>
-      <View style={styles.modalContainer}>
-        <View style={[styles.modalContent, modalContentStyle]}>
-          <Text style={styles.modalTitle}>Add Task</Text>
+    <Modal
+      isVisible={visible} 
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      backdropOpacity={0.5}
+      onBackdropPress={onClose}
+      onBackButtonPress={onClose}
+      style={{ justifyContent: 'center', alignItems: 'center' }}
+      >
+      <View style={[styles.modalContent, modalContentStyle]}>
 
+         <Text style={styles.modalTitle}>Add Task</Text>
           <TextInput style={[styles.input, {color: title === "" ? "#ccc" : "#000"}]}
-            placeholder="Task Title"
-            value={title}
-            onChangeText={setTitle}
-          />
+           placeholder="Task Title"
+           value={title}
+           onChangeText={setTitle}
+         />
 
-          <TextInput style={[styles.input, {color: category === "" ? "#ccc" : "#000"}]}
-            placeholder="Category"
-            value={category}
-            onChangeText={setCategory}
-          />
+         <TextInput style={[styles.input, {color: category === "" ? "#ccc" : "#000"}]}
+           placeholder="Category"
+           value={category}
+           onChangeText={setCategory}
+         />
 
-          <View style={styles.switchRowTight}>
-            <Text>Due By</Text>
-            <Switch
-              value={dueDate}
-              onValueChange={setDueDate}
-            />
-          </View>
+         <View style={styles.switchRowTight}>
+           <Text>Due By</Text>
+           <Switch
+             value={dueDate}
+             onValueChange={setDueDate}
+           />
+         </View>
 
-          {dueDate && (
-              <TextInput
-                style={[styles.dueDateInput, {color: dueDateValue === "" ? "#ccc" : "#000"}]}
-                placeholder={`Enter Due Date (In ${new Date().toLocaleDateString()} format)`}
-                onChangeText={setDueDateValue}
-                />
-          )}
+         {dueDate && (
+             <TextInput
+               style={[styles.dueDateInput, {color: dueDateValue === "" ? "#ccc" : "#000"}]}
+               placeholder={`Enter Due Date (In ${new Date().toLocaleDateString()} format)`}
+               onChangeText={setDueDateValue}
+               />
+         )}
 
-          <View style={styles.switchRow}>
-            <Text>Repeatable</Text>
-            <TouchableOpacity
-              onPress={() => setRepeatable(!repeatable)}
-              style={styles.arrowButton}
-            >
-              <Text style={styles.arrowText}>→</Text>
-            </TouchableOpacity>
-          </View>
+         <View style={styles.switchRow}>
+           <Text>Repeatable</Text>
+           <TouchableOpacity
+             onPress={() => setRepeatingModalVisible(true)}
+             style={styles.arrowButton}
+           >
+             <Text style={styles.arrowText}>→</Text>
+           </TouchableOpacity>
+         </View>
 
-          <View style={styles.modalButtons}>
-            <Button title="Cancel" onPress={onClose} color="#888" />
-            <Button title="Add" onPress={handleAdd} />
-          </View>
-        </View>
+         <View style={styles.modalButtons}>
+           <Button title="Cancel" onPress={onClose} color="#888" />
+           <Button title="Add" onPress={handleAdd} />
+         </View>
+
+         <RepeatingModal
+            visible={RepeatingModalVisible}
+            onClose={() => setRepeatingModalVisible(false)}
+            onAdd={(data) => console.log(data)}
+        />
+
       </View>
     </Modal>
     );
@@ -101,12 +118,6 @@ function AddTaskModal({ visible, onClose, onAdd }) {
 export default AddTaskModal;
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 10,
