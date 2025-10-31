@@ -8,10 +8,7 @@ import AddTaskModal from '../components/AddTaskModal';
 
     function MainScreen() {
 
-    // Mock Tasks for Presentation
-    const [tasks, setTasks] = useState([
-        { id: 4, title: 'Mock Task', completed: false, category: 'Work Task', repeating: 'Repeats M,W @ 9:00AM', dueBy: 'Due by: 10/31' },
-    ]);
+    const [tasks, setTasks] = useState([]);
 
     const [isModalVisible, setModalVisible] = useState(false);
 

@@ -1,54 +1,43 @@
 import React, { useState } from 'react';
 import Modal from 'react-native-modal';
-import { View,
-         Text,
-         TextInput,
-         TouchableOpacity,
-         Button,
-         Switch,
-         Platform,
-         useWindowDimensions,
-         StyleSheet } from 'react-native';
-
+import { View, Text, TextInput, TouchableOpacity, Button, Switch, Platform, useWindowDimensions, StyleSheet } from 'react-native';
 import RepeatingModal from './RepeatingModal.js';
 
 function AddTaskModal({ visible, onClose, onAdd }) {
-
-  const { width, height } = useWindowDimensions();
-
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [repeatable, setRepeatable] = useState(false);
   const [dueDate, setDueDate] = useState(false);
   const [dueDateValue, setDueDateValue] = useState('');
-
   const [RepeatingModalVisible, setRepeatingModalVisible] = useState(false);
+  const [repeatingData, setRepeatingData] = useState(null);
 
-    const handleAdd = () => {
-        const newTask = {
-            id: Date.now(),
-            title: title || 'Untitled Task',
-            completed: false,
-            category: category,
-            repeating: repeatable ? 'Repeats weekly' : null,
-            dueBy: dueDate ? `Due by: ${dueDateValue}` : null,
-        };
-        onAdd(newTask);
-        setTitle('');
-        setCategory('');
-        setRepeatable(false);
-        setDueDate(false);
-        onClose();
-    }
-
-    const modalContentStyle = {
-      width: Platform.OS === 'web' ? Math.min(450, width * 0.4) : width * 0.9,
-      maxHeight: height * 0.9,
-      padding: Platform.OS === 'web' ? 32 : 20,
+  const handleAdd = () => {
+    const newTask = {
+      id: Date.now(),
+      title: title || 'Untitled Task',
+      completed: false,
+      category: category,
+      repeating: repeatable ? repeatingData : null,
+      dueBy: dueDate ? `Due by: ${dueDateValue}` : null,
     };
+    onAdd(newTask);
+    setTitle('');
+    setCategory('');
+    setRepeatable(false);
+    setDueDate(false);
+    onClose();
+  }
+
+  const { width, height } = useWindowDimensions();
+  const modalContentStyle = {
+    width: Platform.OS === 'web' ? Math.min(450, width * 0.4) : width * 0.9,
+    maxHeight: height * 0.9,
+    padding: Platform.OS === 'web' ? 32 : 20,
+  };
 
 
-    return (
+  return (
     <Modal
       isVisible={visible} 
       animationIn="slideInUp"
@@ -107,13 +96,16 @@ function AddTaskModal({ visible, onClose, onAdd }) {
          <RepeatingModal
             visible={RepeatingModalVisible}
             onClose={() => setRepeatingModalVisible(false)}
-            onAdd={(data) => console.log(data)}
+            onAdd={(data) =>{
+              setRepeatingData(data);
+              setRepeatable(true);
+            }}
         />
 
       </View>
     </Modal>
-    );
-  }
+  );
+}
 
 export default AddTaskModal;
 

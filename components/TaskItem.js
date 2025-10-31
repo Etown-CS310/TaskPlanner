@@ -1,6 +1,29 @@
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 
 function TaskItem({ title, completed, category, repeating, dueBy, onToggle }) {
+
+  const renderRepeating = () => {
+    if(!repeating)
+      return null;
+    if(repeating.type === 'Do Not Repeat' || !repeating.interval)
+      return null;
+
+    const intervalLabel = repeating.interval?.toLowerCase() || '';
+    const repeatEvery = parseInt(repeating.repeatEvery) || 1;
+    const startDate = repeating.startDate ? new Date(repeating.startDate).toLocaleDateString() : null;
+    const endDate = repeating.endDate ? new Date(repeating.endDate).toLocaleDateString() : null;
+
+    const pluralize = repeatEvery === 1 ? intervalLabel : intervalLabel + 's';
+
+    return (
+      <Text style={styles.meta}>
+        Repeats every {repeatEvery} {pluralize}
+        {startDate ? ` from ${startDate}` : ''}
+        {endDate ? ` to ${endDate}` : ''}
+      </Text>
+    );
+  }
+
   return (
     <View style= {styles.container}>
       <TouchableOpacity style={styles.checkbox} onPress={onToggle}>
@@ -12,7 +35,7 @@ function TaskItem({ title, completed, category, repeating, dueBy, onToggle }) {
           {title}
         </Text>
         <View style={styles.taskContainer}>
-          {repeating && <Text style={styles.meta}>{repeating}</Text>}
+          {renderRepeating()}
           {dueBy && <Text style={styles.meta}>{dueBy}</Text>}
           {category && <Text style={styles.meta}>{category}</Text>}
         </View>

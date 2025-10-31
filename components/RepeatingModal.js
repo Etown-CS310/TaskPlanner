@@ -1,53 +1,34 @@
 import React, { useState } from 'react';
 import Modal from 'react-native-modal';
-import {View,
-        Text,
-        TextInput,
-        Button,
-        TouchableOpacity,
-        Platform,
-        useWindowDimensions,
-        StyleSheet} from 'react-native';
+import {View, Text, TextInput, Button, TouchableOpacity, Platform, useWindowDimensions, StyleSheet} from 'react-native';
+import LabeledInput from './LabeledInput';
 
 function RepeatingModal({visible, onClose, onAdd, onToggle}){
 
     const { width, height } = useWindowDimensions();
-
     const [repeating, setRepeating] = useState({
-        interval: '',
         type: 'Do Not Repeat', // Do Not, Daily, Weekly, Monthly, Annually
+        interval: '', // Repeats every 'x' days/weeks/months/years
         startDate: '', // Day Task starts to repeat on
-        endType: 'Never', // Never, After 'x' Occurences, On 'x' Date
-        endOccurence: '', // 'x' in " After 'x' Occurences"
         endDate: '', // 'x' in "On 'x' Date"
     });
     
     const handleAdd = () => {
-        const today = new Date();
-        const nextMonth = new Date(today);
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-
-
         const newRepeating = {
             repeatEvery: repeating.interval || null,
             interval: repeating.type || null,
-            startDate: repeating.startDate || today.toISOString(),
-            endType: repeating.endType || null,
-            endOccurence: repeating.endOccurence || null,
-            endDate: repeating.endDate || nextMonth.toISOString(),
+            startDate: repeating.startDate || new Date().toLocaleDateString(),
+            endDate: repeating.endDate || null,
         };
         onAdd(newRepeating);
         setRepeating({
             interval: '',
             type: 'Do Not Repeat',
             startDate: '',
-            endType: 'Never',
-            endOccurence: '',
             endDate: '',
         });
         onClose();
     }
-    
 
         const modalContentStyle = {
         width: Platform.OS === 'web' ? Math.min(450, width * 0.4) : width * 0.9,
@@ -56,7 +37,6 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
         overflow: 'scroll',
     };
     
-
     return (
         <Modal
             isVisible={visible} 
@@ -74,7 +54,7 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
     {/* Options to select for how frequently the task repeats */}
         <Text style={styles.subheader}>Frequency</Text>
         <View style={styles.boxOutline}>
-        {['Do Not Repeat', 'Daily', 'Weekly', 'Monthly', 'Annually'].map(option => (
+        {['Do Not Repeat', 'Day', 'Week', 'Month', 'Year'].map(option => (
             <View style={styles.option} key={option}>
             <TouchableOpacity
                 style={styles.optionButton}
@@ -90,48 +70,54 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
         </View>
 
                 
-    {/* Popup for getting more details about the frequency and end date if any*/}  
+    {/* Popup for getting more details about the Interval, Start Date, and End Date*/}  
         {repeating.type && repeating.type !== 'Do Not Repeat' && (
-            <View>
-            <Text style={styles.subheader}>Interval</Text>
-                <View style={styles.boxOutline}>
-                    <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
-                        <Text>Repeats Every: </Text>
-                        <TextInput
-                            style={[styles.input, {
-                                flex: '1px',
-                                color: repeating.interval === "" ? "#ccc" : "#000"
-                            }]}
-                            keyboardType="numeric"
-                            value={repeating.interval}
-                            onChangeText={(val) => setRepeating(prev => ({ ...prev, interval: val }))}
-                            placeholder="1"
-                        />
-                        <Text>{(() => {
-                            switch (repeating.type) {
-                            case 'Daily':
-                                return repeating.interval === '1' ? 'Day' : 'Days';
-                            case 'Weekly':
-                                return repeating.interval === '1' ? 'Week' : 'Weeks';
-                            case 'Monthly':
-                                return repeating.interval === '1' ? 'Month' : 'Months';
-                            case 'Annually':
-                                return repeating.interval === '1' ? 'Year' : 'Years';
-                            default:
-                                return '';
-                            }
-                        })()}
-                        </Text>
-                    </View>
-                    <Text>Starts On: </Text>
-                </View>
+        <View>
+        <Text style={styles.subheader}>Interval</Text>
+            <View style={styles.boxOutline}>
+            <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
+                <Text>Repeats Every: </Text>
+                <TextInput
+                    style={[styles.input, {
+                       flex: '1px',
+                        color: repeating.interval === "" ? "#ccc" : "#000"
+                    }]}
+                    keyboardType="numeric"
+                    value={repeating.interval}
+                    onChangeText={(val) => setRepeating(prev => ({ ...prev, interval: val }))}
+                    placeholder="x"
+                />
+                    <Text>{(() => {
+                    switch (repeating.type) {
+                    case 'Day':
+                        return repeating.interval === '1' ? 'day' : 'days';
+                    case 'Week':
+                        return repeating.interval === '1' ? 'week' : 'weeks';
+                    case 'Month':
+                        return repeating.interval === '1' ? 'month' : 'months';
+                    case 'Year':
+                        return repeating.interval === '1' ? 'year' : 'years';
+                    default:
+                        return '';
+                    }
+                })()}
+                </Text>
             </View>
+                <LabeledInput 
+                    label="Starts On: "
+                    value={repeating.startDate}
+                    placeholder={new Date().toLocaleDateString()}
+                    onChange={(val) => setRepeating(prev => ({ ...prev, startDate: val }))}
+                />
+                <LabeledInput 
+                    label="Ends On: "
+                    value={repeating.endDate}
+                    placeholder="(Leave empty if no end date)"
+                    onChange={(val) => setRepeating(prev => ({ ...prev, endDate: val }))}
+                />
+            </View>
+        </View>
         )}
-            
-                
-        
-
-
 
                 <View style={styles.modalButtons}>
                     <Button title="Close" onPress={onClose} />
@@ -197,10 +183,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     innerCircle: {
-    width: 8,
-    height: 8,
-    borderRadius: 5,
-    backgroundColor: '#000',
+        width: 8,
+        height: 8,
+        borderRadius: 5,
+        backgroundColor: '#000',
     },
     input: {
         marginRight: '4px',
