@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Modal from 'react-native-modal';
 import { View, Text, TextInput, TouchableOpacity, Button, Switch, Platform, useWindowDimensions, StyleSheet } from 'react-native';
 import RepeatingModal from './RepeatingModal.js';

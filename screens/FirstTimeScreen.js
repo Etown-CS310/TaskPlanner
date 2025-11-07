@@ -2,7 +2,7 @@
 // It allows the user to select either a local or cloud account
 // Cloud account brings them to login/signup screen while local brings them to main
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';

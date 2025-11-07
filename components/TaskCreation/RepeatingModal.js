@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Modal from 'react-native-modal';
 import {View, Text, TextInput, Button, TouchableOpacity, Platform, useWindowDimensions, StyleSheet} from 'react-native';
-import LabeledInput from './LabeledInput';
+import LabeledInput from '../UI/LabeledInput';
 
 function RepeatingModal({visible, onClose, onAdd, onToggle}){
 
