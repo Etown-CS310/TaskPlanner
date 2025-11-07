@@ -122,4 +122,4 @@ yarn-error.*
 
 # Firebase configuration
 google-services.json
-firebaseConfig.js
+.env

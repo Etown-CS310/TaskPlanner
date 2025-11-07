@@ -125,28 +125,6 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
                     }}
                 />
 
-    <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
-        <TouchableOpacity onPress={() => {setShowDatePicker(true) ,console.log("test")}}> 
-            <Text>{date.toLocaleDateString()}</Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-            <DateTimePicker
-                mode="date"
-                display="default"
-                title="Choose Start Date"
-                value={date}
-                onChange={(event, selectedDate) => {
-                    if (event.type === 'set') {
-                        const currentDate = selectedDate || date;
-                        setDate(currentDate);
-                    }
-                    setShowDatePicker(false);
-                }}
-            />
-        )}
-    </View>
-
-
             </View>
         </View>
         )}

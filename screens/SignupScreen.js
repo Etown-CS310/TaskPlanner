@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { StyleSheet, View, Text, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 
-import InputField from '../components/InputField';
-import InputPasswordField from '../components/InputPasswordField';
-import Button from '../components/Button';
+import InputField from '../components/UI/InputField';
+import InputPasswordField from '../components/UI/InputPasswordField';
+import Button from '../components/UI/Button';
 
 function SignupScreen() {
 

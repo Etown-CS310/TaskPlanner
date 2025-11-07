@@ -1,38 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-native";
+import { db } from "../firebaseConfig";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+
 
 // Temp for Demonstration Purposes
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-import AddTaskButton from '../components/AddTaskButton.js';
-import SearchBar from '../components/SearchBar.js';
-import TaskItem from '../components/TaskItem.js';
-import AddTaskModal from '../components/AddTaskModal';
+import AddTaskButton from '../components/TaskCreation/AddTaskButton';
+import SearchBar from '../components/SearchBar';
+import TaskItem from '../components/TaskItem';
+import AddTaskModal from '../components/TaskCreation/AddTaskModal';
 
 function MainScreen() {
     const [tasks, setTasks] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [sortCriteria, setSortCriteria] = useState('');
 
-    // Temp for Demonstration Purposes
-        const navigation = useNavigation();
-        const resetChoice = async () => {
-        try {
-            await AsyncStorage.removeItem('isFirstLaunch');
-            await AsyncStorage.removeItem('userChoice');
-            navigation.navigate('FirstTime');
-        } catch (error) {
-            console.error("Error resetting user choice: ", error);
-        }
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "tasks"));
+        const tasksData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTasks(tasksData);
+      } catch (error) {
+        console.error("Error loading tasks: ", error);
+      }
     };
 
+    fetchTasks();
+  }, []);
 
 
-    const handleAddTask = (task) => {
-        setTasks(prev => [...prev, task]);
-    };
+  const handleAddTask = async (task) => {
+    try {
+      const docRef = await addDoc(collection(db, "tasks"), {
+        ...task,
+        completed: false,
+        createdAt: new Date(),
+      });
 
+      setTasks((prev) => [...prev, { id: docRef.id, ...task, completed: false }]);
+    } catch (error) {
+      console.error("Error adding task: ", error);
+    }
+  };
     const toggleTaskCompleted = (id) => {
         setTasks(prevTasks =>
             prevTasks.map(task =>
@@ -57,18 +73,6 @@ function MainScreen() {
                 const repeatA = a.repeating ? 0 : 1;
                 const repeatB = b.repeating ? 0 : 1;
                 return repeatA - repeatB;
-
-            // Fix This to Bring them to top and sort cronologically
-
-            //  case 'Due By':
-            //     const dateA = new Date(a.dueBy);
-            //     const dateB = new Date(b.dueBy);
-
-            //     if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
-            //     if (isNaN(dateA.getTime()))  return 1;
-            //     if (isNaN(dateB.getTime())) return -1;
-
-            //     return dateA - dateB;
             default:
                 return tasks;
             }
@@ -84,13 +88,25 @@ function MainScreen() {
                 return 'Repeating';
             case 'Repeating':
                 return 'Completed';     // Temp while figure out fix, will eventually be 'Due By'
-                // return 'Due By';
-            // case 'Due By':
-            //    return 'Completed';
             default:
                 return 'Completed';
             }
         });
+    };
+
+
+
+
+        // Temp for Demonstration Purposes
+        const navigation = useNavigation();
+        const resetChoice = async () => {
+        try {
+            await AsyncStorage.removeItem('isFirstLaunch');
+            await AsyncStorage.removeItem('userChoice');
+            navigation.navigate('FirstTime');
+        } catch (error) {
+            console.error("Error resetting user choice: ", error);
+        }
     };
 
     return (
@@ -128,8 +144,7 @@ function MainScreen() {
             />
         </View>
     );
-    }
-
+}
 
 export default MainScreen;
 
@@ -152,7 +167,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 5,
         alignItems: 'center',
-        width: '10%',
     },
     buttonText: {
         color: '#000000ff',

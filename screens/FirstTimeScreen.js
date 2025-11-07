@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Button from '../components/Button';
+import Button from '../components/UI/Button';
 
 function FirstTimeScreen() {
     const navigation = useNavigation();
