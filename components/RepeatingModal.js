@@ -5,6 +5,8 @@ import LabeledInput from './LabeledInput';
 
 function RepeatingModal({visible, onClose, onAdd, onToggle}){
 
+    const [date, setDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const { width, height } = useWindowDimensions();
     const [repeating, setRepeating] = useState({
         type: 'Do Not Repeat', // Do Not, Daily, Weekly, Monthly, Annually
@@ -84,7 +86,10 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
                     }]}
                     keyboardType="numeric"
                     value={repeating.interval}
-                    onChangeText={(val) => setRepeating(prev => ({ ...prev, interval: val }))}
+                    onChangeText={ (val) => {
+                        const numericVal = val.replace(/[^0-9]/g, '');
+                        setRepeating(prev => ({ ...prev, interval: numericVal }))
+                    }}
                     placeholder="x"
                 />
                     <Text>{(() => {
@@ -107,14 +112,41 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
                     label="Starts On: "
                     value={repeating.startDate}
                     placeholder={new Date().toLocaleDateString()}
-                    onChange={(val) => setRepeating(prev => ({ ...prev, startDate: val }))}
+                    onChange={(val) => {
+                         setRepeating(prev => ({ ...prev, startDate: val }))
+                    }}
                 />
                 <LabeledInput 
                     label="Ends On: "
                     value={repeating.endDate}
                     placeholder="(Leave empty if no end date)"
-                    onChange={(val) => setRepeating(prev => ({ ...prev, endDate: val }))}
+                    onChange={(val) => {
+                        setRepeating(prev => ({ ...prev, endDate: val }))
+                    }}
                 />
+
+    <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
+        <TouchableOpacity onPress={() => {setShowDatePicker(true) ,console.log("test")}}> 
+            <Text>{date.toLocaleDateString()}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+            <DateTimePicker
+                mode="date"
+                display="default"
+                title="Choose Start Date"
+                value={date}
+                onChange={(event, selectedDate) => {
+                    if (event.type === 'set') {
+                        const currentDate = selectedDate || date;
+                        setDate(currentDate);
+                    }
+                    setShowDatePicker(false);
+                }}
+            />
+        )}
+    </View>
+
+
             </View>
         </View>
         )}

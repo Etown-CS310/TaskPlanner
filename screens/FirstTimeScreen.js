@@ -2,21 +2,46 @@
 // It allows the user to select either a local or cloud account
 // Cloud account brings them to login/signup screen while local brings them to main
 
+import React, { useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 
 function FirstTimeScreen() {
-
     const navigation = useNavigation();
 
-    const handleLocal = () => {
-        navigation.navigate('Main');
-    }
+    useEffect(() => {
+        const checkFirstLaunch = async () => {
+            try {
+                const isFirstLaunch = await AsyncStorage.getItem('isFirstLaunch');
+                const userChoice = await AsyncStorage.getItem('userChoice');
+                if (isFirstLaunch === 'false') {
+                    if (userChoice === 'local') {
+                        navigation.navigate('Main');
+                    } else if (userChoice === 'cloud') {
+                        navigation.navigate('Login');
+                    }
+                } else {
+                    await AsyncStorage.setItem('isFirstLaunch', 'false');
+                }
+            } catch (error) {
+                console.error("Error checking first launch: ", error);
+            }
+        };
 
-    const handleCloud = () => {
+        checkFirstLaunch();
+    }, [navigation]);
+
+    const handleLocal = async () => {
+        await AsyncStorage.setItem('userChoice', 'local');
+        navigation.navigate('Main');
+    };
+
+    const handleCloud = async () => {
+        await AsyncStorage.setItem('userChoice', 'cloud');
         navigation.navigate('Login');
-    }
+    };
 
     return (
         <View style={styles.container}>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View, Text, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import InputField from '../components/InputField';
 import InputPasswordField from '../components/InputPasswordField';
@@ -20,6 +21,13 @@ import Button from '../components/Button';
         } else {
             Alert.alert('An Error has occured', 'Invalid username or password. Please try again.');
     }};
+
+
+        const handleBack = async () => {
+            await AsyncStorage.removeItem('userChoice');
+            await AsyncStorage.removeItem('isFirstLaunch');
+            navigation.navigate('FirstTime');
+        };
 
     return (
         <View style={styles.container}>
@@ -53,7 +61,7 @@ import Button from '../components/Button';
                 title={'←'}
                 style={styles.backButton}
                 textStyle={styles.backTextStyle}
-                onPress={() => navigation.navigate('FirstTime')}
+                onPress={handleBack}
             />
         </View>
     );
