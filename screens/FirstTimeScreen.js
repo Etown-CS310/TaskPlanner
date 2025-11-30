@@ -21,7 +21,7 @@ function FirstTimeScreen() {
                         navigation.navigate('Main');
                     } else if (userChoice === 'cloud') {
                         navigation.navigate('Login');
-                    }
+                    } 
                 } else {
                     await AsyncStorage.setItem('isFirstLaunch', 'false');
                 }

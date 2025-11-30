@@ -57,12 +57,13 @@ import Button from '../components/UI/Button';
                 onPress={() => navigation.navigate('Signup')}
             />
 
-            <Button
+        {/* Fix styling issues */}
+            {/* <Button
                 title={'←'}
                 style={styles.backButton}
                 textStyle={styles.backTextStyle}
                 onPress={handleBack}
-            />
+            /> */} 
         </View>
     );
     }

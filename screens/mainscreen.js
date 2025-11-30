@@ -2,16 +2,15 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-native";
 import { db } from "../firebaseConfig";
 import { collection, getDocs, addDoc } from "firebase/firestore";
+import AddTaskButton from '../components/TaskCreation/AddTaskButton';
+import AddTaskModal from '../components/TaskCreation/AddTaskModal';
+import SearchBar from '../components/SearchBar';
+import TaskItem from '../components/TaskItem';
 
 
 // Temp for Demonstration Purposes
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-
-import AddTaskButton from '../components/TaskCreation/AddTaskButton';
-import SearchBar from '../components/SearchBar';
-import TaskItem from '../components/TaskItem';
-import AddTaskModal from '../components/TaskCreation/AddTaskModal';
 
 function MainScreen() {
     const [tasks, setTasks] = useState([]);
@@ -121,7 +120,11 @@ function MainScreen() {
                 <Text style={styles.buttonText}>Reset Option for Demo Purposes</Text>
             </TouchableOpacity>
 
-            <ScrollView contentContainerStyle={styles.taskList}>
+            <ScrollView 
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.taskList}
+            >
                 {sortTasks().map(task => (
                 <TaskItem
                     key={task.id}
@@ -165,12 +168,13 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         backgroundColor: '#ccc',
         borderRadius: 5,
-        padding: 5,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
         alignItems: 'center',
     },
     buttonText: {
         color: '#000000ff',
-        fontSize: 10,
+        fontSize: 15,
         textAlign: 'center',
     },
 });

@@ -76,12 +76,13 @@ function SignupScreen() {
                 onPress={handleSignup}
             />
 
-            <Button
+        {/* Fix styling issues */}
+            {/* <Button
                 title={'←'}
                 style={styles.backButton}
                 textStyle={styles.backTextStyle}
-                onPress={() => navigation.navigate('Login')}
-            />
+                onPress={handleBack}
+            /> */} 
 
         </View>
     );
