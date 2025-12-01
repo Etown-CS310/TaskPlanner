@@ -123,3 +123,4 @@ yarn-error.*
 # Firebase configuration
 google-services.json
 .env
+API/.env.example

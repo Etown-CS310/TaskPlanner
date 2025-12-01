@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-native";
-import { db } from "../firebaseConfig";
-import { collection, getDocs, addDoc } from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AddTaskButton from '../components/TaskCreation/AddTaskButton';
-import AddTaskModal from '../components/TaskCreation/AddTaskModal';
-import SearchBar from '../components/SearchBar';
-import TaskItem from '../components/TaskItem';
-
-
-// Temp for Demonstration Purposes
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { db } from "../API/firebaseConfig";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import AddTaskButton from '../components/TaskManagement/AddTaskButton';
+import AddTaskModal from '../components/TaskManagement/AddTaskModal';
+import TaskItem from '../components/TaskManagement/TaskItem';
+import SearchBar from '../components/SearchBar';
+
 
 function MainScreen() {
     const [tasks, setTasks] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [sortCriteria, setSortCriteria] = useState('');
+    const navigation = useNavigation();
 
     const fetchUserChoice = async () => {
         try {
@@ -128,7 +128,6 @@ function MainScreen() {
 
 
         // Temp for Demonstration Purposes
-        const navigation = useNavigation();
         const resetChoice = async () => {
         try {
             await AsyncStorage.removeItem('isFirstLaunch');
@@ -146,9 +145,14 @@ function MainScreen() {
                 <Text style={styles.buttonText}>{`Sort By: ${sortCriteria}`}</Text>
             </TouchableOpacity>
 
-            {/* Temp for Demonstration Purposes */}
+            {/* Temp for Testing Purposes */}
             <TouchableOpacity style={styles.button} onPress={resetChoice}>
-                <Text style={styles.buttonText}>Reset Option for Demo Purposes</Text>
+                <Text style={styles.buttonText}>Reset Option for Testing</Text>
+            </TouchableOpacity>
+            {/* Temp for Testing Purposes */}
+
+            <TouchableOpacity style={styles.settingButton} onPress={() => navigation.navigate('Settings')}>
+                <Ionicons name="settings-outline" size={24} color="black"/>
             </TouchableOpacity>
 
             <ScrollView 
@@ -208,5 +212,11 @@ const styles = StyleSheet.create({
         color: '#000000ff',
         fontSize: 15,
         textAlign: 'center',
+    },
+    settingButton: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        padding: 10,
     },
 });

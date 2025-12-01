@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, Alert } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 import InputField from '../components/UI/InputField';
 import InputPasswordField from '../components/UI/InputPasswordField';
@@ -26,7 +27,7 @@ import Button from '../components/UI/Button';
         const handleBack = async () => {
             await AsyncStorage.removeItem('userChoice');
             await AsyncStorage.removeItem('isFirstLaunch');
-            navigation.navigate('FirstTime');
+            navigation.goBack();
         };
 
     return (
@@ -57,16 +58,14 @@ import Button from '../components/UI/Button';
                 onPress={() => navigation.navigate('Signup')}
             />
 
-        {/* Fix styling issues */}
-            {/* <Button
-                title={'←'}
-                style={styles.backButton}
-                textStyle={styles.backTextStyle}
-                onPress={handleBack}
-            /> */} 
+        <View style={styles.backButton}>
+            <TouchableOpacity  onPress={handleBack}>
+                <Ionicons name="arrow-back-outline" size={24} />
+            </TouchableOpacity>
+        </View>
         </View>
     );
-    }
+}
 
 
 export default LoginScreen;
@@ -95,10 +94,8 @@ const styles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute',
-        top: 20, 
-        left: 20,
-        backgroundColor: '#fff',
-        borderColor: 'black',
+        top: 50, 
+        left: 30,
         borderWidth: 2,
         borderRadius: 5,
         width: 40,
