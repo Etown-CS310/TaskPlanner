@@ -15,10 +15,14 @@ function LabeledInput({ value, dateType, placeholder, onChange }) {
         };
 
     return(
-        <View style={[{ flexDirection: 'column', alignItems: 'center', marginBottom: '12px'}]} >
+        <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
             <TouchableOpacity onPress={() => setShowDatePicker(true)}> 
-                <Text>{dateType}</Text>
-                <Text style={styles.inputText}>{(value instanceof Date ? value.toLocaleDateString() : placeholder)})}</Text>
+                <View style={{ flexDirection: 'row', width: '100%'}}>
+                    <Text>{dateType}</Text>
+                    <Text style={styles.inputText}>
+                        {(value instanceof Date ? value.toLocaleDateString() : placeholder)}
+                    </Text>
+                </View>
             </TouchableOpacity>
             {showDatePicker && (
                 <DateTimePicker
