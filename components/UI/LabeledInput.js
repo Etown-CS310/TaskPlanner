@@ -11,14 +11,14 @@ function LabeledInput({ value, dateType, placeholder, onChange }) {
             const currentDate = selectedDate || date;
             setDate(currentDate);
             setShowDatePicker(false);
-            onChange(currentDate.toLocaleDateString());
+            onChange(currentDate);
         };
 
     return(
-        <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
+        <View style={[{ flexDirection: 'column', alignItems: 'center', marginBottom: '12px'}]} >
             <TouchableOpacity onPress={() => setShowDatePicker(true)}> 
                 <Text>{dateType}</Text>
-                <Text style={styles.inputText}>{(value || placeholder)}</Text>
+                <Text style={styles.inputText}>{(value instanceof Date ? value.toLocaleDateString() : placeholder)})}</Text>
             </TouchableOpacity>
             {showDatePicker && (
                 <DateTimePicker
