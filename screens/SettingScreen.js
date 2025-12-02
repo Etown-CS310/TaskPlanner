@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
 function SettingScreen() {
-
     const [storageMethod, setStorageMethod] = useState(null);
     const navigation = useNavigation();
     const [isEnabled, setIsEnabled] = useState(false);
@@ -26,7 +25,7 @@ function SettingScreen() {
     return (
         <View style={styles.container}>
             <View style={[{ flexDirection: 'row', alignItems: 'center'}]}>
-                <TouchableOpacity onPress={() => navigation.navigate('Main')}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="chevron-back-outline" size={24} style={styles.backArrow} />
                 </TouchableOpacity>
                 <View style={[{ flexDirection: 'column', alignItems: 'left'}]}>
@@ -58,7 +57,7 @@ function SettingScreen() {
 
             <View style={[styles.settingSection,{marginTop: 5, padding: 11.5}]}>
                 <Text>Notifications</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Main')}> 
+                <TouchableOpacity onPress={() => navigation.navigate('UserInfo')}> 
                     <Ionicons name="chevron-forward-outline" size={24} />
                 </TouchableOpacity>
             </View>
@@ -82,7 +81,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingTop: 20,
     },
-
     title: {
         fontSize: 16,
         fontWeight: 'bold',

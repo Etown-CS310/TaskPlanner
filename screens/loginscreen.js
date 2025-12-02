@@ -3,38 +3,51 @@ import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { db, auth } from "../firebaseConfig";
 import InputField from '../components/UI/InputField';
 import InputPasswordField from '../components/UI/InputPasswordField';
 import Button from '../components/UI/Button';
 
-
     function LoginScreen() {
-
         const [username, setUsername] = useState("");
         const [password, setPassword] = useState("");
         const [showPassword, setShowPassword] = useState(false);
         const navigation = useNavigation();
 
-    const handleLogin = () => {
+        const authenticate = async (username, password) => {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, username, password);
+                const user = userCredential.user;
+                return user.uid;
+            } catch (error) {
+                console.error("Login error: ", error);
+                return null;
+            }
+        }
+
+    const handleLogin = async () => {
         if (username && password) {
-            navigation.navigate('Main');
+            const fetchedUserId = await authenticate(username, password);
+            if (fetchedUserId) {
+                await AsyncStorage.setItem('userId', fetchedUserId);
+                navigation.navigate('Main');
+            } else {
+            Alert.alert('An Error has occurred', 'Invalid username or password. Please try again.');
+            }
         } else {
             Alert.alert('An Error has occured', 'Invalid username or password. Please try again.');
     }};
 
-
-        const handleBack = async () => {
-            await AsyncStorage.removeItem('userChoice');
-            await AsyncStorage.removeItem('isFirstLaunch');
-            navigation.goBack();
-        };
+    const handleBack = async () => {
+        await AsyncStorage.removeItem('userChoice');
+        await AsyncStorage.removeItem('isFirstLaunch');
+        navigation.goBack();
+    };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textStyle}>
-                Enter User Details to Login
-            </Text>
+            <Text style={styles.textStyle}>Enter User Details to Login</Text>
             <InputField
                 value={username}
                 title={"Enter Username"}
@@ -47,10 +60,7 @@ import Button from '../components/UI/Button';
                 showPassword={showPassword}
                 toggleShowPassword={() => setShowPassword(!showPassword)}
             />
-            <Button 
-                title={'Login'}
-                onPress={handleLogin}
-            />
+            <Button title={'Login'} onPress={handleLogin}/>
             <Button
                 title={'Signup'}
                 style={styles.signupButton}
@@ -66,7 +76,6 @@ import Button from '../components/UI/Button';
         </View>
     );
 }
-
 
 export default LoginScreen;
 

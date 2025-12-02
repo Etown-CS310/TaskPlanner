@@ -3,35 +3,36 @@ import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-nati
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { db } from "../API/firebaseConfig";
+import { db, auth } from "../firebaseConfig";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import AddTaskButton from '../components/TaskManagement/AddTaskButton';
 import AddTaskModal from '../components/TaskManagement/AddTaskModal';
 import TaskItem from '../components/TaskManagement/TaskItem';
 import SearchBar from '../components/SearchBar';
 
-
 function MainScreen() {
     const [tasks, setTasks] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [sortCriteria, setSortCriteria] = useState('');
+    const [userId, setUserId] = useState(null);
     const navigation = useNavigation();
 
-    const fetchUserChoice = async () => {
+    const fetchUserId = async () => {
         try {
-            return await AsyncStorage.getItem('userChoice');
+            return await AsyncStorage.getItem('userId');
         } catch (error) {
             console.error("Error fetching user choice: ", error);
             return null;
         }
     }; 
 
-    const fetchTasks = async (storageMethod) => {
+    const fetchTasks = async (storageMethod, userId) => {
         if (storageMethod === 'local') {
             try {
                 const storedTasks = await AsyncStorage.getItem('tasks');
                 if (storedTasks) {
-                    setTasks(JSON.parse(storedTasks));
+                    const filteredTasks = JSON.parse(storedTasks).filter(task => task.userId === userId);
+                    setTasks(filteredTasks);
                 }
             } catch (error) {
                 console.error("Error loading tasks from AsyncStorage: ", error);
@@ -39,10 +40,9 @@ function MainScreen() {
         } else {
             try {
                 const snapshot = await getDocs(collection(db, "tasks"));
-                const tasksData = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-                }));
+                const tasksData = snapshot.docs
+                .map((doc) => ({id: doc.id,...doc.data() }))
+                .filter(task => task.userId === userId);
                 setTasks(tasksData);
             } catch (error) {
                 console.error("Error loading tasks: ", error);
@@ -51,29 +51,39 @@ function MainScreen() {
     };
 
     useEffect(() => {
-        const loadTasks = async () => {
-            const userChoice = await fetchUserChoice();
-            if (userChoice)
-                fetchTasks(userChoice); 
+        const loadUserId = async () => {
+            const fetchedUserId = await fetchUserId();
+            setUserId(fetchedUserId);
         };
-        loadTasks();
+        loadUserId();
     }, []);
 
 
+    useEffect(() => {
+        const loadTasks = async () => {
+            if (userId) {
+                await fetchTasks('cloud', userId);
+            }};
+        loadTasks();
+    }, [userId]);
+
   const handleAddTask = async (task) => {
-    const storageMethod = await fetchUserChoice();
+    const storageMethod = await fetchUserId();
     if (storageMethod === 'local') {
-        const newTasks = [...tasks, { id: Date.now().toString(), ...task, completed: false }];
+        const newTasks = [...tasks, { id: Date.now().toString(), ...task, userId: 
+                        userId || 'defaultUser', completed: false }];
         setTasks(newTasks);
         await AsyncStorage.setItem('tasks', JSON.stringify(newTasks));
     } else {
         try {
             const docRef = await addDoc(collection(db, "tasks"), {
                 ...task,
+                userId: userId || 'defaultUser',
                 completed: false,
                 createdAt: new Date(),
                 });
-            setTasks((prev) => [...prev, { id: docRef.id, ...task, completed: false }]);
+            setTasks((prev) => [...prev, { id: docRef.id, ...task, 
+                userId: userId || 'defaultUser', completed: false }]);
     } catch (error) {
         console.error("Error adding task: ", error);
         }
@@ -127,7 +137,7 @@ function MainScreen() {
 
 
 
-        // Temp for Demonstration Purposes
+        // Temp for Testing Purposes
         const resetChoice = async () => {
         try {
             await AsyncStorage.removeItem('isFirstLaunch');
@@ -179,11 +189,11 @@ function MainScreen() {
                 visible={isModalVisible}
                 onClose={() => setModalVisible(false)}
                 onAdd={handleAddTask}
+                userId={userId}
             />
         </View>
     );
 }
-
 
 export default MainScreen;
 

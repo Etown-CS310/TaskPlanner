@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import Modal from 'react-native-modal';
-import { View, Text, TextInput, TouchableOpacity, Button, Switch, Platform, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, 
+  Switch, Platform, useWindowDimensions, StyleSheet } from 'react-native';
 import RepeatingModal from './RepeatingModal.js';
 
-function AddTaskModal({ visible, onClose, onAdd }) {
+function AddTaskModal({ visible, onClose, onAdd, userId }) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [repeatable, setRepeatable] = useState(false);
@@ -12,9 +13,23 @@ function AddTaskModal({ visible, onClose, onAdd }) {
   const [RepeatingModalVisible, setRepeatingModalVisible] = useState(false);
   const [repeatingData, setRepeatingData] = useState(null);
 
+  const resetForm = () => {
+      setTitle('');
+      setCategory('');
+      setRepeatable(false);
+      setDueDate(false);
+      setDueDateValue('');
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   const handleAdd = () => {
     const newTask = {
       id: Date.now(),
+      userId: userId || 'defaultUser',
       title: title || 'Untitled Task',
       completed: false,
       category: category,
@@ -22,11 +37,7 @@ function AddTaskModal({ visible, onClose, onAdd }) {
       dueBy: dueDate ? `Due by: ${dueDateValue}` : null,
     };
     onAdd(newTask);
-    setTitle('');
-    setCategory('');
-    setRepeatable(false);
-    setDueDate(false);
-    onClose();
+    handleClose();
   }
 
   const { width, height } = useWindowDimensions();
@@ -89,7 +100,7 @@ function AddTaskModal({ visible, onClose, onAdd }) {
          </View>
 
          <View style={styles.modalButtons}>
-           <Button title="Cancel" onPress={onClose} color="#888" />
+           <Button title="Cancel" onPress={handleClose} color="#888" />
            <Button title="Add" onPress={handleAdd} />
          </View>
 

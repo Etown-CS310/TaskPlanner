@@ -2,8 +2,8 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: "YourAppName",
-    slug: "your-app-slug",
+    name: "Task Planner",
+    slug: "task-planner-slug",
     extra: {
       firebase: {
         apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,

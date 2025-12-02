@@ -1,14 +1,15 @@
-// Screen to input username, email, and password for account creation
-import { useState } from 'react';
-import { StyleSheet, View, Text, Alert } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
-
+import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import {auth, db} from '../firebaseConfig';
+import {doc, setDoc} from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import InputField from '../components/UI/InputField';
 import InputPasswordField from '../components/UI/InputPasswordField';
 import Button from '../components/UI/Button';
 
 function SignupScreen() {
-
         const [username, setUsername] = useState("");
         const [email, setEmail] = useState("");
         const [password, setPassword] = useState("");
@@ -17,7 +18,7 @@ function SignupScreen() {
         const [showConfirmPassword, setShowConfirmPassword] = useState(false);
         const navigation = useNavigation();
         
-        const handleSignup = () => {
+        const handleSignup = async () => {
             setUsername(username.trim());
             setEmail(email.trim());
             setPassword(password.trim());
@@ -26,7 +27,6 @@ function SignupScreen() {
             const emailIsValid = email.includes('@') && email.includes('.');
             const passwordIsValid = password.length >= 8 && 
                   password.includes('#' || '!' || '?' || '$' || '%') && /[0-9]/.test(password);
-
 
             if (!username){
                 Alert.alert('Invalid Input', 'Please enter a valid username to signup.');
@@ -44,11 +44,22 @@ function SignupScreen() {
             } if (!confirmPassword) {
                 Alert.alert('Invalid Input', 'Please confirm your password.');
                 return;
-            } if (password === confirmPassword){
+            } if (password !== confirmPassword){
                 Alert.alert('Invalid Input', 'Passwords do not match. Please try again.');
                 return;
-            }
-            navigation.navigate('Login');
+            } try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const userId = userCredential.user.uid;
+                await setDoc(doc(db, "users", userId), {
+                    username: username,
+                    email: email,
+                    userId: userId
+                });
+                Alert.alert('Signup Successful', 'Your account has been created successfully!');
+                navigation.navigate('Login');
+            } catch (error) {
+                Alert.alert('Signup Error', error.message);
+            }   
         };
 
     return (
@@ -76,17 +87,14 @@ function SignupScreen() {
                 onPress={handleSignup}
             />
 
-        {/* Fix styling issues */}
-            {/* <Button
-                title={'←'}
-                style={styles.backButton}
-                textStyle={styles.backTextStyle}
-                onPress={handleBack}
-            /> */} 
+            <View style={styles.backButton}>
+                <TouchableOpacity  onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back-outline" size={24} />
+                </TouchableOpacity>
+            </View>
 
         </View>
     );
-    
 }
 
 export default SignupScreen;
@@ -104,12 +112,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontWeight: 'bold',
     },
-        backButton: {
+    backButton: {
         position: 'absolute',
-        top: 20, 
-        left: 20,
-        backgroundColor: '#fff',
-        borderColor: 'black',
+        top: 50, 
+        left: 30,
         borderWidth: 2,
         borderRadius: 5,
         width: 40,
