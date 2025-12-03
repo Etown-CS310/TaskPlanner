@@ -1,9 +1,9 @@
 import { TextInput, StyleSheet } from 'react-native';
 
-const InputField = ({ value, title, onChangeText }) => {
+const InputField = ({ value, title, onChangeText, style }) => {
   return (
     <TextInput
-      style={[styles.textInput, {color: value === "" ? "#ccc" : "#000"}]}
+      style={[styles.textInput, style, {color: value === "" ? "#ccc" : "#000"}]}
       placeholder={title}
       value={value}
       onChangeText={onChangeText}

@@ -3,7 +3,7 @@ import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-nati
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { db, auth } from "../firebaseConfig";
+import { db } from "../firebaseConfig";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import AddTaskButton from '../components/TaskManagement/AddTaskButton';
 import AddTaskModal from '../components/TaskManagement/AddTaskModal';
@@ -21,7 +21,7 @@ function MainScreen() {
         try {
             return await AsyncStorage.getItem('userId');
         } catch (error) {
-            console.error("Error fetching user choice: ", error);
+            console.error("Error fetching user ID: ", error);
             return null;
         }
     }; 
