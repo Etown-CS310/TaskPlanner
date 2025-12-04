@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 
-function TaskItem({ title, completed, category, repeating, dueBy, onToggle }) {
+function TaskItem({ title, completed, category, repeating, dueBy, onToggle, onEdit }) {
   const renderRepeating = () => {
     if(!repeating)
       return null;
@@ -33,14 +33,14 @@ function TaskItem({ title, completed, category, repeating, dueBy, onToggle }) {
         <Text style={[styles.title, completed && styles.completed]}>
           {title}
         </Text>
-        <View style={styles.taskContainer}>
+        <View style={styles.textContainer}>
               {renderRepeating()}
               {dueBy && <Text style={styles.meta}>{dueBy}</Text>}
               {category && <Text style={styles.meta}>{category}</Text>}
         </View>
       </View>
 
-      <TouchableOpacity style={styles.editIcon}>
+      <TouchableOpacity style={styles.editIcon} onPress={onEdit}>
         <Text style={styles.editText}>✎</Text>
       </TouchableOpacity>
     </View>

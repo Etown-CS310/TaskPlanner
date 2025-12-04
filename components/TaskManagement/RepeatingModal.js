@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Modal from 'react-native-modal';
-import {View, Text, TextInput, Button, TouchableOpacity, Platform, useWindowDimensions, StyleSheet} from 'react-native';
+import {View, Text, TextInput, Button, TouchableOpacity,
+     Platform, useWindowDimensions, StyleSheet} from 'react-native';
+import { Timestamp } from 'firebase/firestore';
 import LabeledInput from '../UI/LabeledInput';
 
 function RepeatingModal({visible, onClose, onAdd, onToggle}){
@@ -14,14 +16,14 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
     });
     
     const handleAdd = () => {
-        const validStartDate = new Date(repeating.startDate);
-        const validEndDate = new Date(repeating.endDate);
+        const validStartDate = repeating.startDate.trim() !== "" ? new Date(repeating.startDate) : null;
+        const validEndDate = repeating.endDate.trim() !== "" ? new Date(repeating.endDate) : null;
 
         const newRepeating = {
             repeatEvery: repeating.interval || null,
             interval: repeating.type || null,
-            startDate: validStartDate.toString() !== 'Invalid Date' ? validStartDate : new Date().toLocaleDateString(),
-            endDate: validEndDate.toString() !== 'Invalid Date' ? validEndDate : null,
+            startDate:  validStartDate ? Timestamp.fromDate(validStartDate) : Timestamp.fromDate(new Date()),
+            endDate: validEndDate ? Timestamp.fromDate(validEndDate) : null,
         };
         onAdd(newRepeating);
         setRepeating({
