@@ -9,8 +9,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/UI/Button';
 
 function FirstTimeScreen() {
+    // Navigation Variable
     const navigation = useNavigation();
 
+    // Check if first launch
+    // If not first launch, check storage method and navigate accordingly
     useEffect(() => {
         const checkFirstLaunch = async () => {
             try {
@@ -33,6 +36,7 @@ function FirstTimeScreen() {
         checkFirstLaunch();
     }, [navigation]);
 
+    // Handlers for button presses
     const handleLocal = async () => {
         await AsyncStorage.setItem('userChoice', 'local');
         navigation.navigate('Main');
@@ -44,6 +48,8 @@ function FirstTimeScreen() {
     };
 
     return (
+        // UI Elements for first time screen
+        // Two buttons for local and cloud storage options
         <View style={styles.container}>
             <Text style={styles.title}>Welcome to TaskPlanner!</Text>
             <Text style={styles.text}>Please choose how you would like to save your data:</Text>
@@ -51,7 +57,6 @@ function FirstTimeScreen() {
             <Button title ={'Save Across Devices'} onPress={handleCloud} />
         </View>
     );
-
 }
 
 export default FirstTimeScreen;
@@ -69,8 +74,6 @@ const styles = StyleSheet.create({
         marginBottom: 50,
         textAlign: 'center',
         fontWeight: 'bold',
-        // Font family not natively supported in React Native? Need to import custom fonts?
-        // fontFamily: 'Arial',
     },
     text: {
         fontSize: 18,

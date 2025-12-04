@@ -8,19 +8,21 @@ import { collection, getDocs } from "firebase/firestore";
 import Button from '../components/UI/Button';
 import InputField from '../components/UI/InputField';
 
-function UserInfo() {
+function UserInfoScreen() {
+    // Navigation and State Variables
     const navigation = useNavigation();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [value, setValue] = useState(null);
 
+    // Dropdown data
     const data = [
         { label: 'Change Username', value: 'Username'},
         { label: 'Change Email', value: 'Email'},
         { label: 'Change Password', value: 'Password'},
     ];
     
-
+    // Fetch current user info from Firestore
     const fetchUserInfo = async () => {
         try {
             const snapshot = await getDocs(collection(db, "users"));
@@ -40,6 +42,8 @@ function UserInfo() {
 
     return (
         <View style={styles.container}>
+
+            {/* Back Arrow and Title Section */}
             <View style={[{ flexDirection: 'row', alignItems: 'center'}]}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="chevron-back-outline" size={24} style={styles.backArrow} />
@@ -49,6 +53,7 @@ function UserInfo() {
                 </View>
             </View>
 
+            {/* Current User Information Section */}
             <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%'}]}>Current Information</Text>
             <View style={[styles.currentInfo,{marginTop: 5, padding: 11}]}>
                 <Text>Current Username: </Text>
@@ -58,6 +63,18 @@ function UserInfo() {
                 <Text>Current Email: </Text>
                 <Text>{email}</Text>
             </View>
+
+            {/* 
+                Form where user can update their username, email, and password
+                5 Input fields:
+                    1. Shown when nothing is selected from dropdown - Keeps it so there is always 3 fields
+                    2. If Value is 'Password' - "Enter Current Password"
+                    3. If Value is 'Username' or 'Email' - "Enter New {value}"
+                    4. If Value is 'Username' or 'Email' - "Re-Enter New {value}"
+                    5. If Value is 'Username' or 'Email' - "Enter Current Password"
+                Update Button that updates the selected info
+            
+            */}
             <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%'}]}>Update Information</Text>
             <View style={[styles.updateInfo,{marginTop: 5, padding: 11}]}>
                 <Dropdown
@@ -68,12 +85,22 @@ function UserInfo() {
                     value={value}
                     onChange={item => {setValue(item.value);}}
                 />
+                {(value === null) && (
                 <InputField
                     style={styles.enterInfo}
                     value={value ? "" : ""}
                     title={value ? `Enter Current ${value}` : "Select an option from Dropdown"}
                     onChangeText={() => {}}
                 />
+                )}
+                {(value === 'Password') && (
+                <InputField
+                    style={styles.enterInfo}
+                    value={value ? "" : ""}
+                    title={value ? `Enter Current ${value}` : "Select an option from Dropdown"}
+                    onChangeText={() => {}}
+                />
+                )}
                 <InputField
                     style={styles.enterInfo}
                     value={value ? "" : ""}
@@ -83,9 +110,17 @@ function UserInfo() {
                 <InputField
                     style={styles.enterInfo}
                     value={value ? "" : ""}
-                    title={value ? `Re-Enter Current ${value}` : "Select an option from Dropdown"}
+                    title={value ? `Re-Enter New ${value}` : "Select an option from Dropdown"}
                     onChangeText={() => {}}
                 />
+                {(value === 'Email' || value === 'Username') && (
+                <InputField
+                    style={styles.enterInfo}
+                    value={value ? "" : ""}
+                    title={value ? `Enter Current Password` : "Select an option from Dropdown"}
+                    onChangeText={() => {}}
+                />
+                )}
 
                 <Button 
                     style={styles.updateButton}
@@ -100,7 +135,7 @@ function UserInfo() {
     )
 }
 
-export default UserInfo;
+export default UserInfoScreen;
 
 const styles = StyleSheet.create({
     container: {

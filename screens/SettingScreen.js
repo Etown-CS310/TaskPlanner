@@ -5,11 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
 function SettingScreen() {
+    // Navigation and State Variables
     const [storageMethod, setStorageMethod] = useState(null);
     const navigation = useNavigation();
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
+    // Fetch user choice from AsyncStorage
     const fetchUserChoice = async () => {
         try {
             const choice = await AsyncStorage.getItem('userChoice');
@@ -24,6 +26,10 @@ function SettingScreen() {
 
     return (
         <View style={styles.container}>
+            {/* 
+                Back Arrow and Title Section 
+                Shows wherther the user is saving locally or on the cloud
+            */}
             <View style={[{ flexDirection: 'row', alignItems: 'center'}]}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="chevron-back-outline" size={24} style={styles.backArrow} />
@@ -39,6 +45,12 @@ function SettingScreen() {
                 </View>
             </View>
                 
+            {/* 
+                User Settings Section 
+                Login Button - Navigates to login or user info based on storage method
+                Notifications Button - Navigates to notification screen (to be implemented)
+                Dark Mode Toggle - Toggles dark mode (functionality to be implemented)
+            */}
             <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%'}]}>User Settings</Text>
 
             <View style={[styles.settingSection,{marginTop: 5, padding: 11}]}>

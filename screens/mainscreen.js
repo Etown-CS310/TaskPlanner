@@ -11,21 +11,15 @@ import TaskItem from '../components/TaskManagement/TaskItem';
 import SearchBar from '../components/SearchBar';
 
 function MainScreen() {
+    // Navigation and State Variables
     const [tasks, setTasks] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [sortCriteria, setSortCriteria] = useState('');
+    const [storageMethod, setStorageMethod] = useState(null);
     const [userId, setUserId] = useState(null);
     const navigation = useNavigation();
 
-    const fetchUserId = async () => {
-        try {
-            return await AsyncStorage.getItem('userId');
-        } catch (error) {
-            console.error("Error fetching user ID: ", error);
-            return null;
-        }
-    }; 
-
+    // Fetch Tasks from Local Storage or Firestore
     const fetchTasks = async (storageMethod, userId) => {
         if (storageMethod === 'local') {
             try {
@@ -50,25 +44,31 @@ function MainScreen() {
         }
     };
 
+    // Load User Choice and ID on Mount
     useEffect(() => {
-        const loadUserId = async () => {
-            const fetchedUserId = await fetchUserId();
-            setUserId(fetchedUserId);
+        const loadChoiceAndId = async () => {
+            const choice = await AsyncStorage.getItem('userChoice');
+            const storedUserId = await AsyncStorage.getItem('userId');
+            setUserId(storedUserId || 'defaultUser');
+            setStorageMethod(choice);
         };
-        loadUserId();
+        loadChoiceAndId();
     }, []);
 
-
+    // Fetch Tasks when userId changes
     useEffect(() => {
         const loadTasks = async () => {
             if (userId) {
-                await fetchTasks('cloud', userId);
+                await fetchTasks(storageMethod, userId);
             }};
         loadTasks();
     }, [userId]);
 
-  const handleAddTask = async (task) => {
-    const storageMethod = await fetchUserId();
+    // Handler for adding a new task
+    // Decides storage method based on user choice
+    const handleAddTask = async (task) => {
+    const storageMethod =  await AsyncStorage.getItem('userChoice');
+
     if (storageMethod === 'local') {
         const newTasks = [...tasks, { id: Date.now().toString(), ...task, userId: 
                         userId || 'defaultUser', completed: false }];
@@ -89,6 +89,7 @@ function MainScreen() {
         }
     }};
 
+    // Toggle Task Completion Status
     const toggleTaskCompleted = (id) => {
         setTasks(prevTasks =>
             prevTasks.map(task =>
@@ -97,6 +98,8 @@ function MainScreen() {
         );
     };
 
+    // Sorts tasks based on selected criteria
+    // 'Completed', 'Category', 'Repeating', 'Due By'
     const sortTasks = () => {
         const sortedTasks = [...tasks];
 
@@ -119,6 +122,7 @@ function MainScreen() {
         });
     };
 
+    // Handles cycling through sort criteria
     const handleSortToggle = () => {
         setSortCriteria(prev => {
             switch (prev) {
@@ -149,7 +153,15 @@ function MainScreen() {
     };
 
     return (
+        
         <View style={styles.container}>
+            {/* 
+                Search Bar to filter tasks by title
+                Sort By Button - 'Completed', 'Category', 'Repeating', 'Due By'
+                Settings Button (Top Right)
+                Task List (ScrollView)
+                Add Task Button and Modal
+             */}
             <SearchBar/>
             <TouchableOpacity style={styles.button} onPress={handleSortToggle}>
                 <Text style={styles.buttonText}>{`Sort By: ${sortCriteria}`}</Text>
