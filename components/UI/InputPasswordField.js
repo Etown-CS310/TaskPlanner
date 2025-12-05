@@ -1,12 +1,16 @@
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../../hooks/useTheme';
 
 const InputPasswordField = ({ value, title, onChangeText, showPassword, toggleShowPassword }) => {
+  const { theme } = useTheme();
+
   return (
-    <View style={styles.passwordContainer}>
+    <View style={[styles.passwordContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <TextInput
-        style={[styles.passwordInput, {color: value === "" ? "#ccc" : "#000"}]}
+        style={[styles.passwordInput, {color: value === "" ? theme.colors.textSecondary : theme.colors.text}]}
         placeholder={title}
+        placeholderTextColor={theme.colors.textSecondary}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={!showPassword}
@@ -15,7 +19,7 @@ const InputPasswordField = ({ value, title, onChangeText, showPassword, toggleSh
           <MaterialCommunityIcons
             name={showPassword ? 'eye-off' : 'eye'}
             size={24}
-            color="#333"
+            color={theme.colors.text}
           />
       </TouchableOpacity>
     </View>
@@ -30,11 +34,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: '#ccc',
     borderRadius: 6,
     paddingHorizontal: 10,
     marginVertical: 12,
-    backgroundColor: '#fff',
   },
   passwordInput: {
     flex: 1,

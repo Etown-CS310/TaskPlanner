@@ -1,10 +1,14 @@
 import { TextInput, StyleSheet } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
 
 const InputField = ({ value, title, onChangeText, style }) => {
+  const { theme } = useTheme();
+
   return (
     <TextInput
-      style={[styles.textInput, style, {color: value === "" ? "#ccc" : "#000"}]}
+      style={[styles.textInput, style, {color: value === "" ? theme.colors.textSecondary : theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border}]}
       placeholder={title}
+      placeholderTextColor={theme.colors.textSecondary}
       value={value}
       onChangeText={onChangeText}
     />
@@ -19,7 +23,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginVertical: 12,
     borderWidth: 3,
-    borderColor: '#ccc',
     borderRadius: 6,
     fontSize: 16,
     fontWeight: '400',

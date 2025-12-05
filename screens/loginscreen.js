@@ -5,12 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
+import { useTheme } from '../hooks/useTheme';
 import InputField from '../components/UI/InputField';
 import InputPasswordField from '../components/UI/InputPasswordField';
 import Button from '../components/UI/Button';
 
     function LoginScreen() {
         // Navigation and State Variables
+        const { theme } = useTheme();
         const [username, setUsername] = useState("");
         const [password, setPassword] = useState("");
         const [showPassword, setShowPassword] = useState(false);
@@ -53,16 +55,8 @@ import Button from '../components/UI/Button';
     };
 
     return (
-        <View style={styles.container}>
-            {/*  
-                Text Prompt for User
-                Input Field for username or email
-                Input Password Field for password
-                Login Buttton for authentication
-                Signup Button to navigate to Signup Screen
-                Back Button to return to previous screen
-            */}
-            <Text style={styles.textStyle}>Enter User Details to Login</Text>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <Text style={[styles.textStyle, { color: theme.colors.text }]}>Enter User Details to Login</Text>
             <InputField
                 value={username}
                 title={"Enter Username"}
@@ -85,7 +79,7 @@ import Button from '../components/UI/Button';
 
         <View style={styles.backButton}>
             <TouchableOpacity  onPress={handleBack}>
-                <Ionicons name="arrow-back-outline" size={24} />
+                <Ionicons name="arrow-back-outline" size={24} color={theme.colors.text} />
             </TouchableOpacity>
         </View>
         </View>
@@ -100,7 +94,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
     },
     textStyle: {
         fontSize: 15,

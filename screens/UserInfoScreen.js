@@ -5,11 +5,13 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
+import { useTheme } from '../hooks/useTheme';
 import Button from '../components/UI/Button';
 import InputField from '../components/UI/InputField';
 
 function UserInfoScreen() {
     // Navigation and State Variables
+    const { theme } = useTheme();
     const navigation = useNavigation();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -41,27 +43,27 @@ function UserInfoScreen() {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
 
             {/* Back Arrow and Title Section */}
             <View style={[{ flexDirection: 'row', alignItems: 'center'}]}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="chevron-back-outline" size={24} style={styles.backArrow} />
+                    <Ionicons name="chevron-back-outline" size={24} style={[styles.backArrow, { color: theme.colors.text }]} />
                 </TouchableOpacity>
                 <View style={[{ flexDirection: 'column', alignItems: 'left'}]}>
-                    <Text style={styles.title}>Login</Text>
+                    <Text style={[styles.title, { color: theme.colors.text }]}>Login</Text>
                 </View>
             </View>
 
             {/* Current User Information Section */}
-            <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%'}]}>Current Information</Text>
-            <View style={[styles.currentInfo,{marginTop: 5, padding: 11}]}>
-                <Text>Current Username: </Text>
-                <Text>{username}</Text>
+            <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%', color: theme.colors.text}]}>Current Information</Text>
+            <View style={[styles.currentInfo,{marginTop: 5, padding: 11, backgroundColor: theme.colors.surface, borderColor: theme.colors.border}]}>
+                <Text style={{ color: theme.colors.text }}>Current Username: </Text>
+                <Text style={{ color: theme.colors.text }}>{username}</Text>
             </View>
-            <View style={[styles.currentInfo,{marginTop: 5, padding: 11}]}>
-                <Text>Current Email: </Text>
-                <Text>{email}</Text>
+            <View style={[styles.currentInfo,{marginTop: 5, padding: 11, backgroundColor: theme.colors.surface, borderColor: theme.colors.border}]}>
+                <Text style={{ color: theme.colors.text }}>Current Email: </Text>
+                <Text style={{ color: theme.colors.text }}>{email}</Text>
             </View>
 
             {/* 
@@ -75,10 +77,12 @@ function UserInfoScreen() {
                 Update Button that updates the selected info
             
             */}
-            <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%'}]}>Update Information</Text>
-            <View style={[styles.updateInfo,{marginTop: 5, padding: 11}]}>
+            <Text style={[styles.header, {marginTop: 25, marginLeft: '12.5%', color: theme.colors.text}]}>Update Information</Text>
+            <View style={[styles.updateInfo,{marginTop: 5, padding: 11, backgroundColor: theme.colors.surface, borderColor: theme.colors.border}]}>
                 <Dropdown
-                    style={{ width: '100%' }}
+                    style={[{ width: '100%', color: theme.colors.text }, styles.dropdown]}
+                    itemTextStyle={{ color: theme.colors.text }}
+                    containerStyle={{ backgroundColor: theme.colors.surface }}
                     data={data}
                     labelField="label"
                     valueField="value"
@@ -143,7 +147,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'left',
-        backgroundColor: '#fff',
         paddingTop: 20,
     },
     title: {
@@ -158,7 +161,6 @@ const styles = StyleSheet.create({
     backArrow: {
         marginTop: 25,
         marginLeft: 25,
-        color: 'black',
     },
     currentInfo: {
         flexDirection: 'row',
@@ -195,5 +197,9 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: '#ccc',
         width: '50%',
+    },
+    dropdown: {
+        paddingHorizontal: 8,
+        paddingVertical: 6,
     }
 });

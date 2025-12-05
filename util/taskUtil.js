@@ -1,35 +1,42 @@
+import { isValidDateString } from './dateUtil';
+
 // Handles cycling through sort criteria
 export const getNextSortCriteria = (current) => {
     switch (current) {
+        case 'All':
+            return 'Due Date';
+        case 'Due Date':
+            return 'Completed';
         case 'Completed':
             return 'Category';
         case 'Category':
             return 'Repeating';
         case 'Repeating':
-            return 'Completed';     // Temp while figure out fix, will eventually be 'Due By'
+            return 'All';
         default:
-            return 'Completed';
+            return 'All';
         }
 }
 
-// Sorts tasks based on selected criteria
-// 'Completed', 'Category', 'Repeating', 'Due By'
+// Filters and sorts tasks based on selected criteria
+// 'All', 'Due Date', 'Completed', 'Category', 'Repeating'
 export const sortTasks = (tasks, sortCriteria) => {
     const sortedTasks = [...tasks];
-    return sortedTasks.sort((a, b) => {
-        switch (sortCriteria) {
-            case 'Completed':
-                return Number(a.completed) - Number(b.completed);
-            case 'Category':
-                if (!a.category && !b.category) return 0;
-                if (!a.category) return 1;
-                if (!b.category) return -1;
-                return a.category.localeCompare(b.category);
-            case 'Repeating':
-                return (a.repeating ? 0 : 1) - (b.repeating ? 0 : 1);
-            default:
-                return tasks;
-            }
-        });
-    };
+    
+    switch (sortCriteria) {
+        case 'All':
+            return sortedTasks;
+        case 'Due Date':
+            return sortedTasks.filter(task => task.dueBy && isValidDateString(task.dueBy));
+        case 'Completed':
+            return sortedTasks.filter(task => task.completed);
+        case 'Category':
+            return sortedTasks.filter(task => task.category && task.category.trim() !== '')
+                .sort((a, b) => a.category.localeCompare(b.category));
+        case 'Repeating':
+            return sortedTasks.filter(task => task.repeating);
+        default:
+            return sortedTasks;
+    }
+};
 

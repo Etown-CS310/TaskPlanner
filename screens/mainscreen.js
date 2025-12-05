@@ -2,78 +2,67 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useTasks } from '../hooks/useTasks';
-import { getNextSortCriteria, sortTasks } from '../util/taskUtil';
+import { useTheme } from '../hooks/useTheme';
+import { useNotifications } from '../hooks/useNotifications';
+import { useSortAndFilter } from '../hooks/useSortAndFilter';
 import AddTaskButton from '../components/TaskManagement/AddTaskButton';
 import AddTaskModal from '../components/TaskManagement/AddTaskModal';
 import TaskItem from '../components/TaskManagement/TaskItem';
 import SearchBar from '../components/SearchBar';
 import EditTaskModal from '../components/TaskManagement/EditTaskModal';
+import { loadUserId, resetAppPreferences } from '../util/appUtil';
 
 function MainScreen() {
     // Navigation and State Variables
+    const { theme } = useTheme();
     const [userId, setUserId] = useState(null);
-    const [sortCriteria, setSortCriteria] = useState('');
     const [isAddModalVisible, setAddModalVisible] = useState(false);
     const [isEditModalVisible, setEditModalVisible] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const navigation = useNavigation();
 
-    const { tasks, handleAddTask, handleSaveTask, toggleTaskCompleted } = useTasks(userId);
+    const { tasks, handleAddTask, handleDeleteTask, handleSaveTask, toggleTaskCompleted } = useTasks(userId);
+    useNotifications(tasks);
+    
+    const {
+      sortCriteria,
+      searchQuery,
+      setSearchQuery,
+      handleSortToggle,
+      filteredTasks,
+    } = useSortAndFilter(tasks);
 
     useEffect(() => {
-        const loadUserId = async () => {
-        const storedUserId = await AsyncStorage.getItem('userId');
-        setUserId(storedUserId || 'defaultUser');
+        const initializeUserId = async () => {
+            const userId = await loadUserId();
+            setUserId(userId);
         };
-        loadUserId();
+        initializeUserId();
     }, []);
 
-
-    const handleSortToggle = () => {
-        setSortCriteria(prev => getNextSortCriteria(prev));
-    };
-
-    const sortedTasks = sortTasks(tasks, sortCriteria);
-
-
-
-        // Temp for Testing Purposes
-        const resetChoice = async () => {
-        try {
-            await AsyncStorage.removeItem('isFirstLaunch');
-            await AsyncStorage.removeItem('userChoice');
-            navigation.navigate('FirstTime');
-        } catch (error) {
-            console.error("Error resetting user choice: ", error);
-        }
+    const handleResetDemo = async () => {
+        await resetAppPreferences();
+        navigation.navigate('FirstTime');
     };
 
     return (
         
-        <View style={styles.container}>
-            {/* 
-                Search Bar to filter tasks by title
-                Sort By Button - 'Completed', 'Category', 'Repeating', 'Due By'
-                Settings Button (Top Right)
-                Task List (ScrollView)
-                Add Task Button and Modal
-             */}
-            <SearchBar/>
-            <TouchableOpacity style={styles.button} onPress={handleSortToggle}>
-                <Text style={styles.buttonText}>{`Sort By: ${sortCriteria}`}</Text>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <SearchBar onSearchChange={setSearchQuery} />
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]} onPress={handleSortToggle}>
+                <Text style={[styles.buttonText, { color: theme.colors.text }]}>{`Sort By: ${sortCriteria}`}</Text>
             </TouchableOpacity>
 
             {/* Temp for Testing Purposes */}
-            <TouchableOpacity style={styles.button} onPress={resetChoice}>
-                <Text style={styles.buttonText}>Reset Option for Testing</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]} onPress={handleResetDemo}>
+                <Text style={[styles.buttonText, { color: theme.colors.text }]}>Reset Option for Demo</Text>
             </TouchableOpacity>
             {/* Temp for Testing Purposes */}
 
             <TouchableOpacity style={styles.settingButton} onPress={() => navigation.navigate('Settings')}>
-                <Ionicons name="settings-outline" size={24} color="black"/>
+                <Ionicons name="settings-outline" size={24} color={theme.colors.text}/>
             </TouchableOpacity>
 
             <ScrollView 
@@ -81,7 +70,7 @@ function MainScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.taskList}
             >
-                {sortedTasks.map(task => (
+                {filteredTasks.map(task => (
                 <TaskItem
                     key={task.id}
                     title={task.title}
@@ -103,6 +92,8 @@ function MainScreen() {
                 onSave = {handleSaveTask}
                 task = {selectedTask}
                 onClose={() => setEditModalVisible(false)}
+                userId={userId}
+                onDelete={handleDeleteTask}
             />
             
             <AddTaskButton onPress={() => setAddModalVisible(true)} />
@@ -125,7 +116,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        backgroundColor: '#fff',
         paddingTop: 20,
     },
     taskList: {
@@ -134,14 +124,13 @@ const styles = StyleSheet.create({
     },
     button: {
         marginBottom: 10,
-        backgroundColor: '#ccc',
         borderRadius: 5,
         paddingVertical: 5,
         paddingHorizontal: 10,
         alignItems: 'center',
+        borderWidth: 1,
     },
     buttonText: {
-        color: '#000000ff',
         fontSize: 15,
         textAlign: 'center',
     },

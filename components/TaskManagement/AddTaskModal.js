@@ -1,25 +1,34 @@
 import { useState } from 'react';
 import Modal from 'react-native-modal';
-import { View, Text, TextInput, TouchableOpacity, Button, 
-  Switch, Platform, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, Switch, Platform, StyleSheet } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
+import { useTaskForm } from '../../hooks/useTaskForm';
+import { DatePickerButton } from '../UI/DatePickerButton';
 import RepeatingModal from './RepeatingModal.js';
+import useModalDimensions from '../../hooks/useModalDimensions';
 
 function AddTaskModal({ visible, onClose, onAdd, userId }) {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [repeatable, setRepeatable] = useState(false);
-  const [dueDate, setDueDate] = useState(false);
-  const [dueDateValue, setDueDateValue] = useState('');
+  const { theme } = useTheme();
+  const modalContentStyle = useModalDimensions();
   const [RepeatingModalVisible, setRepeatingModalVisible] = useState(false);
-  const [repeatingData, setRepeatingData] = useState(null);
-
-  const resetForm = () => {
-      setTitle('');
-      setCategory('');
-      setRepeatable(false);
-      setDueDate(false);
-      setDueDateValue('');
-  };
+  
+  const {
+    title,
+    category,
+    repeatable,
+    dueDate,
+    dueDateValue,
+    repeatingData,
+    setTitle,
+    setCategory,
+    setRepeatable,
+    setDueDate,
+    setDueDateValue,
+    setRepeatingData,
+    resetForm,
+    buildTaskObject,
+    handleRepeatingDataChange,
+  } = useTaskForm();
 
   const handleClose = () => {
     resetForm();
@@ -27,26 +36,10 @@ function AddTaskModal({ visible, onClose, onAdd, userId }) {
   };
 
   const handleAdd = () => {
-    const newTask = {
-      id: Date.now(),
-      userId: userId || 'defaultUser',
-      title: title || 'Untitled Task',
-      completed: false,
-      category: category,
-      repeating: repeatable ? repeatingData : null,
-      dueBy: dueDate ? `Due by: ${dueDateValue}` : null,
-    };
+    const newTask = buildTaskObject(userId);
     onAdd(newTask);
     handleClose();
-  }
-
-  const { width, height } = useWindowDimensions();
-  const modalContentStyle = {
-    width: Platform.OS === 'web' ? Math.min(450, width * 0.4) : width * 0.9,
-    maxHeight: height * 0.9,
-    padding: Platform.OS === 'web' ? 32 : 20,
   };
-
 
   return (
     <Modal
@@ -58,23 +51,25 @@ function AddTaskModal({ visible, onClose, onAdd, userId }) {
       onBackButtonPress={onClose}
       style={{ justifyContent: 'center', alignItems: 'center' }}
       >
-      <View style={[styles.modalContent, modalContentStyle]}>
+      <View style={[styles.modalContent, modalContentStyle, { backgroundColor: theme.colors.background }]}>
 
-         <Text style={styles.modalTitle}>Add Task</Text>
-          <TextInput style={[styles.input, {color: title === "" ? "#ccc" : "#000"}]}
+         <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Add Task</Text>
+          <TextInput style={[styles.input, {color: title === "" ? theme.colors.textSecondary : theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border}]}
            placeholder="Task Title"
+           placeholderTextColor={theme.colors.textSecondary}
            value={title}
            onChangeText={setTitle}
          />
 
-         <TextInput style={[styles.input, {color: category === "" ? "#ccc" : "#000"}]}
+         <TextInput style={[styles.input, {color: category === "" ? theme.colors.textSecondary : theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border}]}
            placeholder="Category"
+           placeholderTextColor={theme.colors.textSecondary}
            value={category}
            onChangeText={setCategory}
          />
 
          <View style={styles.switchRowTight}>
-           <Text>Due By</Text>
+           <Text style={{ color: theme.colors.text }}>Due By</Text>
            <Switch
              value={dueDate}
              onValueChange={setDueDate}
@@ -82,20 +77,20 @@ function AddTaskModal({ visible, onClose, onAdd, userId }) {
          </View>
 
          {dueDate && (
-             <TextInput
-               style={[styles.dueDateInput, {color: dueDateValue === "" ? "#ccc" : "#000"}]}
-               placeholder={`Enter Due Date (In ${new Date().toLocaleDateString()} format)`}
-               onChangeText={setDueDateValue}
-               />
+           <DatePickerButton
+             value={dueDateValue}
+             onChange={setDueDateValue}
+             label="Select Due Date"
+           />
          )}
 
          <View style={styles.switchRow}>
-           <Text>Repeatable</Text>
+           <Text style={{ color: theme.colors.text }}>Repeatable</Text>
            <TouchableOpacity
              onPress={() => setRepeatingModalVisible(true)}
              style={styles.arrowButton}
            >
-             <Text style={styles.arrowText}>→</Text>
+             <Text style={[styles.arrowText, { color: theme.colors.text }]}>→</Text>
            </TouchableOpacity>
          </View>
 
@@ -107,10 +102,7 @@ function AddTaskModal({ visible, onClose, onAdd, userId }) {
          <RepeatingModal
             visible={RepeatingModalVisible}
             onClose={() => setRepeatingModalVisible(false)}
-            onAdd={(data) =>{
-              setRepeatingData(data);
-              setRepeatable(true);
-            }}
+            onAdd={handleRepeatingDataChange}
         />
 
       </View>
@@ -122,7 +114,6 @@ export default AddTaskModal;
 
 const styles = StyleSheet.create({
   modalContent: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     elevation: 5,
   },
@@ -138,7 +129,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -159,7 +149,6 @@ const styles = StyleSheet.create({
   },
   dueDateInput: {
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     marginVertical: 10,
     fontSize: 16,
   },
@@ -171,6 +160,5 @@ const styles = StyleSheet.create({
   arrowText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: 'black',
   },
 });

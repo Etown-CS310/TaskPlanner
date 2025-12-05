@@ -1,98 +1,142 @@
 import { useState, useEffect } from 'react';
-import {View, Text, TextInput, Button, Switch, Platform, useWindowDimensions, StyleSheet} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, Button, Switch, Platform, StyleSheet} from 'react-native';
 import Modal from 'react-native-modal';
+import { useTheme } from '../../hooks/useTheme';
+import { useTaskForm } from '../../hooks/useTaskForm';
+import { DatePickerButton } from '../UI/DatePickerButton';
+import RepeatingModal from './RepeatingModal.js';
+import useModalDimensions from '../../hooks/useModalDimensions';
 
-function EditTaskModal({ visible, onClose, onSave, task }) {
-    const [title, setTitle] = useState('');
-    const [category, setCategory] = useState('');
-    const [repeatable, setRepeatable] = useState(false);
-    const [dueDate, setDueDate] = useState(false);
-    const [dueDateValue, setDueDateValue] = useState('');
-    const [repeatingData, setRepeatingData] = useState(null);
+function EditTaskModal({ visible, onClose, onSave, userId, task, onDelete }) {
+    const { theme } = useTheme();
+    const modalContentStyle = useModalDimensions();
+    const [repeatingModalVisible, setRepeatingModalVisible] = useState(false);
+    
+    const {
+      title,
+      category,
+      repeatable,
+      dueDate,
+      dueDateValue,
+      repeatingData,
+      setTitle,
+      setCategory,
+      setRepeatable,
+      setDueDate,
+      setDueDateValue,
+      setRepeatingData,
+      buildTaskObject,
+      handleRepeatingDataChange,
+    } = useTaskForm(task);
 
-    useEffect(() => {
-        if (task) {
-            setTitle(task.title || '');
-            setCategory(task.category || '');
-            setRepeatable(!!task.repeating);
-            setDueDate(!!task.dueBy);
-            setDueDateValue(task.dueBy || '');
-            setRepeatingData(task.repeating || null);
+    const handleDelete = async () => {
+        try {
+            if (!onDelete) {
+                console.error('No onDelete prop provided to EditTaskModal');
+                return;
+            }
+            const success = await onDelete(task);
+            if (success) {
+                // Wait a tick to allow React state update to flush before closing modal
+                await new Promise(resolve => setTimeout(resolve, 50));
+                onClose();
+            } else {
+                console.error('Task deletion failed (onDelete returned false)');
+            }
+        } catch (error) {
+            console.error("Error deleting task:", error);
         }
-    }, [task]);
-
-    const handleSave = () => {
-    const updatedTask = {
-        ...task,
-        title,
-        category,
-        dueBy: dueDate ? dueDateValue : null,
-        repeating: repeatable ? repeatingData : null,
     };
 
-    onSave(updatedTask);
-    onClose();
-};
-
-    const { width, height } = useWindowDimensions();
-    const modalContentStyle = {
-        width: Platform.OS === 'web' ? Math.min(450, width * 0.4) : width * 0.9,
-        maxHeight: height * 0.9,
-        padding: Platform.OS === 'web' ? 32 : 20,
-    };  
+    const handleSave = () => {
+      const updatedTask = buildTaskObject(userId, task.id);
+      onSave(updatedTask);
+      onClose();
+    };
 
     return (
-        <Modal
-            isVisible={visible} 
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            backdropOpacity={0.5}
-            onBackdropPress={onClose}
-            onBackButtonPress={onClose}
-            style={{ justifyContent: 'center', alignItems: 'center' }}
-            >
-            <View style={[styles.modalContent, modalContentStyle]}>
-                <Text style={styles.modalTitle}>Edit Task</Text>
+        <>
+            <Modal
+                isVisible={visible} 
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                backdropOpacity={0.5}
+                onBackdropPress={onClose}
+                onBackButtonPress={onClose}
+                style={{ justifyContent: 'center', alignItems: 'center' }}
+                >
+            <View style={[styles.modalContent, modalContentStyle, { backgroundColor: theme.colors.background }]}>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Edit Task</Text>
             
                 <View style={styles.section}>
-                    <Text>Current Title: </Text>
-                    <TextInput style={[styles.input, {color: title === "" ? "#ccc" : "#000"}]}
+                    <Text style={{ color: theme.colors.text }}>Current Title: </Text>
+                    <TextInput style={[styles.input, {color: title === "" ? theme.colors.textSecondary : theme.colors.text, backgroundColor: theme.colors.surface}]}
                         placeholder="Enter New Title"
+                        placeholderTextColor={theme.colors.textSecondary}
                         value={title}
                         onChangeText={setTitle}
                     />
                 </View>
 
                 <View style={styles.section}>
-                    <Text>Current Category: </Text>
-                    <TextInput style={[styles.input, {color: title === "" ? "#ccc" : "#000"}]}
+                    <Text style={{ color: theme.colors.text }}>Current Category: </Text>
+                    <TextInput style={[styles.input, {color: title === "" ? theme.colors.textSecondary : theme.colors.text, backgroundColor: theme.colors.surface}]}
                         placeholder="Enter New Category"
+                        placeholderTextColor={theme.colors.textSecondary}
                         value={category}
                         onChangeText={setCategory}
                     />
                 </View>
 
                 <View style={styles.switchRowTight}>
-                    <Text>Due By</Text>
+                    <Text style={{ color: theme.colors.text }}>Due By</Text>
                     <Switch
                         value={dueDate}
                         onValueChange={setDueDate}
                     />
                 </View>
                 {dueDate && (
-                    <TextInput
-                    style={[styles.dueDateInput, {color: dueDateValue === "" ? "#ccc" : "#000"}]}
-                    placeholder={`Enter New Due Date (In ${new Date().toLocaleDateString()} format)`}
-                    onChangeText={setDueDateValue}
+                  <DatePickerButton
+                    value={dueDateValue}
+                    onChange={setDueDateValue}
+                    label="Select Due Date"
+                  />
+                )}
+
+                <View style={styles.switchRowTight}>
+                    <Text style={{ color: theme.colors.text }}>Repeatable</Text>
+                    <Switch
+                        value={repeatable}
+                        onValueChange={setRepeatable}
                     />
+                </View>
+                {repeatable && (
+                    <TouchableOpacity onPress={() => setRepeatingModalVisible(true)} style={[styles.repeatingButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                        <Text style={[styles.repeatingText, { color: theme.colors.text }]}>
+                            {repeatingData?.type && repeatingData?.interval
+                                ? `Repeats: ${repeatingData.interval} ${repeatingData.type}${parseInt(repeatingData.interval) > 1 ? 's' : ''}`
+                                : 'Configure repeating'}
+                        </Text>
+                    </TouchableOpacity>
                 )}
 
                 <View style={styles.modalButtons}>
+                    <Button
+                            title="Delete Task"
+                            onPress={handleDelete}
+                            color="#d9534f"
+                        />
                     <Button title="Close" onPress={onClose} color="#888"/>
                     <Button title="Save" onPress={handleSave} />
                 </View>
             </View>
-        </Modal>
+            </Modal>
+            <RepeatingModal
+                visible={repeatingModalVisible}
+                onClose={() => setRepeatingModalVisible(false)}
+                onAdd={handleRepeatingDataChange}
+            />
+        </>
     )
 }
 
@@ -100,7 +144,6 @@ export default EditTaskModal;
 
 const styles = StyleSheet.create({
     modalContent: {
-        backgroundColor: '#fff',
         borderRadius: 10,
         elevation: 5,
     },
@@ -112,7 +155,7 @@ const styles = StyleSheet.create({
     modalButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 12,
+        marginTop: 50,
     },
     section: {
         flexDirection: 'row',
@@ -124,27 +167,30 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 10,
-  },
-    dueDateInput: {
-        borderBottomWidth: 1,
-        borderColor: '#ccc',
-        marginVertical: 10,
-        fontSize: 16,
-  },
+    },
     input: {
         alignSelf: "flex-start",
         marginRight: '4px',
         marginLeft: '4px',
         paddingVertical: 2,
         fontWeight: 'bold',
-        textDecorationStyle: 'solid',
-        borderBottomWidth: 2,
-        color: '#363636ff',
     },
-  dueDateInput: {
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    marginVertical: 10,
-    fontSize: 16,
-  },
+    dueDateInput: {
+        borderBottomWidth: 1,
+        marginVertical: 10,
+        fontSize: 16,
+    },
+    repeatingText: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginVertical: 8,
+    },
+    repeatingButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        marginVertical: 8,
+        alignItems: 'center',
+    },
 });

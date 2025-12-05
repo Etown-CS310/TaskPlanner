@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import Modal from 'react-native-modal';
-import {View, Text, TextInput, Button, TouchableOpacity,
-     Platform, useWindowDimensions, StyleSheet} from 'react-native';
-import { Timestamp } from 'firebase/firestore';
+import {View, Text, TextInput, Button, TouchableOpacity, Platform, useWindowDimensions, StyleSheet} from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
 import LabeledInput from '../UI/LabeledInput';
+import useModalDimensions from '../../hooks/useModalDimensions';
 
 function RepeatingModal({visible, onClose, onAdd, onToggle}){
 
-    const { width, height } = useWindowDimensions();
+    const { theme } = useTheme();
+    const modalContentStyle = useModalDimensions();
     const [repeating, setRepeating] = useState({
         type: 'Do Not Repeat', // Do Not, Daily, Weekly, Monthly, Annually
         interval: '', // Repeats every 'x' days/weeks/months/years
@@ -16,14 +17,16 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
     });
     
     const handleAdd = () => {
-        const validStartDate = repeating.startDate.trim() !== "" ? new Date(repeating.startDate) : null;
-        const validEndDate = repeating.endDate.trim() !== "" ? new Date(repeating.endDate) : null;
+        const validStartDate = repeating.startDate ? new Date(repeating.startDate) : new Date();
+        const startDate = isNaN(validStartDate.getTime()) ? today : validStartDate;
+        const validEndDate = repeating.endDate ? new Date(repeating.endDate) : null;
+        const endDate = validEndDate && !isNaN(validEndDate.getTime()) ? validEndDate : null;
 
         const newRepeating = {
             repeatEvery: repeating.interval || null,
             interval: repeating.type || null,
-            startDate:  validStartDate ? Timestamp.fromDate(validStartDate) : Timestamp.fromDate(new Date()),
-            endDate: validEndDate ? Timestamp.fromDate(validEndDate) : null,
+            startDate,
+            endDate,
         };
         onAdd(newRepeating);
         setRepeating({
@@ -34,13 +37,6 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
         });
         onClose();
     }
-
-        const modalContentStyle = {
-        width: Platform.OS === 'web' ? Math.min(450, width * 0.4) : width * 0.9,
-        maxHeight: height * 0.9,
-        padding: Platform.OS === 'web' ? 32 : 20,
-        overflow: 'scroll',
-    };
     
     return (
         <Modal
@@ -52,23 +48,23 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
             onBackButtonPress={onClose}
             style={{ justifyContent: 'center', alignItems: 'center' }}
         >
-            <View style={[styles.modalContent, modalContentStyle,]}>
-                <Text style={styles.modalTitle}>Task</Text>
+            <View style={[styles.modalContent, modalContentStyle, { backgroundColor: theme.colors.background }]}>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Task</Text>
 
 
     {/* Options to select for how frequently the task repeats */}
-        <Text style={styles.subheader}>Frequency</Text>
-        <View style={styles.boxOutline}>
+        <Text style={[styles.subheader, { color: theme.colors.text }]}>Frequency</Text>
+        <View style={[styles.boxOutline, { borderColor: theme.colors.border }]}>
         {['Do Not Repeat', 'Day', 'Week', 'Month', 'Year'].map(option => (
             <View style={styles.option} key={option}>
             <TouchableOpacity
                 style={styles.optionButton}
                 onPress={() => setRepeating(prev => ({ ...prev, type: option }))}
             >
-                <View style={styles.selectOption}>
-                {repeating.type === option && <View style={styles.innerCircle} />}
+                <View style={[styles.selectOption, { borderColor: theme.colors.text }]}>
+                {repeating.type === option && <View style={[styles.innerCircle, { backgroundColor: theme.colors.text }]} />}
                 </View>
-                <Text style={styles.optionText}>{option}</Text>
+                <Text style={[styles.optionText, { color: theme.colors.text }]}>{option}</Text>
             </TouchableOpacity>
             </View>
         ))}
@@ -78,15 +74,17 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
     {/* Popup for getting more details about the Interval, Start Date, and End Date*/}  
         {repeating.type && repeating.type !== 'Do Not Repeat' && (
         <View>
-        <Text style={styles.subheader}>Interval</Text>
-            <View style={styles.boxOutline}>
+        <Text style={[styles.subheader, { color: theme.colors.text }]}>Interval</Text>
+            <View style={[styles.boxOutline, { borderColor: theme.colors.border }]}>
             <View style={[{ flexDirection: 'row', alignItems: 'center', marginBottom: '12px'}]} >
-                <Text>Repeats Every: </Text>
+                <Text style={{ color: theme.colors.text }}>Repeats Every: </Text>
                 <TextInput
                     style={[styles.input, {
                        flex: '1px',
-                        color: repeating.interval === "" ? "#ccc" : "#000"
+                        color: repeating.interval === "" ? theme.colors.textSecondary : theme.colors.text,
+                        backgroundColor: theme.colors.surface,
                     }]}
+                    placeholderTextColor={theme.colors.textSecondary}
                     keyboardType="numeric"
                     value={repeating.interval}
                     onChangeText={ (val) => {
@@ -95,7 +93,7 @@ function RepeatingModal({visible, onClose, onAdd, onToggle}){
                     }}
                     placeholder="x"
                 />
-                <Text>{(() => {
+                <Text style={{ color: theme.colors.text }}>{(() => {
                     switch (repeating.type) {
                     case 'Day':
                         return repeating.interval === '1' ? 'day' : 'days';
@@ -145,7 +143,6 @@ export default RepeatingModal;
 
 const styles = StyleSheet.create({
     modalContent: {
-        backgroundColor: '#fff',
         borderRadius: 10,
         elevation: 5,
     },
@@ -167,7 +164,6 @@ const styles = StyleSheet.create({
     },
     boxOutline: {
         borderWidth: 2,
-        borderColor: '#ccc',
         borderRadius: '15px',
         padding: '8px',
         marginLeft: '4px',
@@ -177,7 +173,6 @@ const styles = StyleSheet.create({
         height: 12,
         borderWidth: 1,
         borderRadius: 50,
-        borderColor: '#000',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -199,12 +194,10 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 5,
-        backgroundColor: '#000',
     },
     input: {
         marginRight: '4px',
         marginLeft: '4px',
         fontWeight: 'bold',
-        color: '#363636ff',
     }
 });

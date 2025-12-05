@@ -1,9 +1,11 @@
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useTheme } from "../../hooks/useTheme";
 
 function AddTaskButton( {onPress} ) {
+  const { theme } = useTheme();
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={{fontSize: 30, color: '#002b3d'}}>+</Text>
+    <TouchableOpacity style={[styles.button, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]} onPress={onPress}>
+        <Text style={{fontSize: 30, color: theme.colors.text}}>+</Text>
     </TouchableOpacity>
   );
 }
